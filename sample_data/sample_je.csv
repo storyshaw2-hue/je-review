@@ -1,0 +1,311 @@
+je_id,entry_date,effective_date,period,posted_at,entered_by,approved_by,source,description,line_no,account,account_name,debit,credit
+JE-2024-0001,2024-11-06,2024-11-06,2024-11,2024-11-06 09:47:00,asmith,mgr_chen,System,Vendor invoice posting,1,1110,Trade Receivables,11696.23,0.0
+JE-2024-0001,2024-11-06,2024-11-06,2024-11,2024-11-06 09:47:00,asmith,mgr_chen,System,Vendor invoice posting,2,5020,Freight Expense,0.0,11696.23
+JE-2024-0002,2024-11-27,2024-11-27,2024-11,2024-11-27 15:02:00,asmith,mgr_chen,System,Supplies purchase,1,1310,Inventory - Materials,1445.52,0.0
+JE-2024-0002,2024-11-27,2024-11-27,2024-11,2024-11-27 15:02:00,asmith,mgr_chen,System,Supplies purchase,2,5010,COGS - Materials,0.0,1445.52
+JE-2024-0003,2024-11-26,2024-11-26,2024-11,2024-11-26 12:45:00,lmartin,mgr_diaz,System,Inventory receipt,1,1010,Cash - Operating,27365.17,0.0
+JE-2024-0003,2024-11-26,2024-11-26,2024-11,2024-11-26 12:45:00,lmartin,mgr_diaz,System,Inventory receipt,2,6120,Utilities Expense,0.0,27365.17
+JE-2024-0004,2024-11-01,2024-11-01,2024-11,2024-11-01 11:44:00,bwong,mgr_chen,System,Inventory receipt,1,6310,Office Supplies Expense,17865.28,0.0
+JE-2024-0004,2024-11-01,2024-11-01,2024-11,2024-11-01 11:44:00,bwong,mgr_chen,System,Inventory receipt,2,5020,Freight Expense,0.0,17865.28
+JE-2024-0005,2024-11-05,2024-11-05,2024-11,2024-11-05 15:06:00,bwong,mgr_olsen,System,Customer billing,1,5010,COGS - Materials,15205.34,0.0
+JE-2024-0005,2024-11-05,2024-11-05,2024-11,2024-11-05 15:06:00,bwong,mgr_olsen,System,Customer billing,2,1010,Cash - Operating,0.0,15205.34
+JE-2024-0006,2024-11-26,2024-11-26,2024-11,2024-11-26 10:59:00,lmartin,mgr_diaz,System,Bank fee posting,1,6310,Office Supplies Expense,16022.74,0.0
+JE-2024-0006,2024-11-26,2024-11-26,2024-11,2024-11-26 10:59:00,lmartin,mgr_diaz,System,Bank fee posting,2,6110,Office Rent Expense,0.0,16022.74
+JE-2024-0007,2024-11-05,2024-11-05,2024-11,2024-11-05 09:42:00,bwong,mgr_chen,System,Inventory receipt,1,5020,Freight Expense,9726.15,0.0
+JE-2024-0007,2024-11-05,2024-11-05,2024-11,2024-11-05 09:42:00,bwong,mgr_chen,System,Inventory receipt,2,2010,Trade Payables,0.0,9726.15
+JE-2024-0008,2024-11-13,2024-11-13,2024-11,2024-11-13 16:40:00,asmith,mgr_diaz,System,Utility payment,1,6110,Office Rent Expense,35065.82,0.0
+JE-2024-0008,2024-11-13,2024-11-13,2024-11,2024-11-13 16:40:00,asmith,mgr_diaz,System,Utility payment,2,6120,Utilities Expense,0.0,35065.82
+JE-2024-0009,2024-11-05,2024-11-05,2024-11,2024-11-05 11:34:00,asmith,mgr_diaz,System,Rent payment,1,6120,Utilities Expense,30677.5,0.0
+JE-2024-0009,2024-11-05,2024-11-05,2024-11,2024-11-05 11:34:00,asmith,mgr_diaz,System,Rent payment,2,1110,Trade Receivables,0.0,30677.5
+JE-2024-0010,2024-11-12,2024-11-12,2024-11,2024-11-12 14:53:00,jdoe,mgr_chen,System,Monthly accrual per schedule,1,6310,Office Supplies Expense,32315.51,0.0
+JE-2024-0010,2024-11-12,2024-11-12,2024-11,2024-11-12 14:53:00,jdoe,mgr_chen,System,Monthly accrual per schedule,2,2010,Trade Payables,0.0,32315.51
+JE-2024-0011,2024-11-13,2024-11-13,2024-11,2024-11-13 10:13:00,lmartin,mgr_olsen,System,Utility payment,1,6110,Office Rent Expense,38369.09,0.0
+JE-2024-0011,2024-11-13,2024-11-13,2024-11,2024-11-13 10:13:00,lmartin,mgr_olsen,System,Utility payment,2,1010,Cash - Operating,0.0,38369.09
+JE-2024-0012,2024-11-19,2024-11-19,2024-11,2024-11-19 16:09:00,asmith,mgr_olsen,System,Supplies purchase,1,1110,Trade Receivables,11271.99,0.0
+JE-2024-0012,2024-11-19,2024-11-19,2024-11,2024-11-19 16:09:00,asmith,mgr_olsen,System,Supplies purchase,2,6120,Utilities Expense,0.0,11271.99
+JE-2024-0013,2024-11-27,2024-11-27,2024-11,2024-11-27 15:57:00,bwong,mgr_chen,System,Payroll allocation,1,1110,Trade Receivables,24591.68,0.0
+JE-2024-0013,2024-11-27,2024-11-27,2024-11,2024-11-27 15:57:00,bwong,mgr_chen,System,Payroll allocation,2,1010,Cash - Operating,0.0,24591.68
+JE-2024-0014,2024-11-05,2024-11-05,2024-11,2024-11-05 09:55:00,asmith,mgr_olsen,System,Rent payment,1,1310,Inventory - Materials,4783.33,0.0
+JE-2024-0014,2024-11-05,2024-11-05,2024-11,2024-11-05 09:55:00,asmith,mgr_olsen,System,Rent payment,2,5020,Freight Expense,0.0,4783.33
+JE-2024-0015,2024-11-19,2024-11-19,2024-11,2024-11-19 15:38:00,lmartin,mgr_diaz,System,Supplies purchase,1,5010,COGS - Materials,41837.87,0.0
+JE-2024-0015,2024-11-19,2024-11-19,2024-11,2024-11-19 15:38:00,lmartin,mgr_diaz,System,Supplies purchase,2,5020,Freight Expense,0.0,41837.87
+JE-2024-0016,2024-11-26,2024-11-26,2024-11,2024-11-26 13:49:00,jdoe,mgr_diaz,System,Rent payment,1,6010,Wages Expense,26992.2,0.0
+JE-2024-0016,2024-11-26,2024-11-26,2024-11,2024-11-26 13:49:00,jdoe,mgr_diaz,System,Rent payment,2,1010,Cash - Operating,0.0,26992.2
+JE-2024-0017,2024-11-01,2024-11-01,2024-11,2024-11-01 13:32:00,lmartin,mgr_chen,System,Customer billing,1,1110,Trade Receivables,32050.02,0.0
+JE-2024-0017,2024-11-01,2024-11-01,2024-11,2024-11-01 13:32:00,lmartin,mgr_chen,System,Customer billing,2,6110,Office Rent Expense,0.0,32050.02
+JE-2024-0018,2024-11-07,2024-11-07,2024-11,2024-11-07 14:48:00,lmartin,mgr_chen,System,Bank fee posting,1,6310,Office Supplies Expense,6952.75,0.0
+JE-2024-0018,2024-11-07,2024-11-07,2024-11,2024-11-07 14:48:00,lmartin,mgr_chen,System,Bank fee posting,2,1010,Cash - Operating,0.0,6952.75
+JE-2024-0019,2024-11-01,2024-11-01,2024-11,2024-11-01 10:59:00,bwong,mgr_chen,System,Monthly accrual per schedule,1,6110,Office Rent Expense,15372.6,0.0
+JE-2024-0019,2024-11-01,2024-11-01,2024-11,2024-11-01 10:59:00,bwong,mgr_chen,System,Monthly accrual per schedule,2,5020,Freight Expense,0.0,15372.6
+JE-2024-0020,2024-11-05,2024-11-05,2024-11,2024-11-05 16:52:00,lmartin,mgr_chen,System,Payroll allocation,1,1010,Cash - Operating,3093.08,0.0
+JE-2024-0020,2024-11-05,2024-11-05,2024-11,2024-11-05 16:52:00,lmartin,mgr_chen,System,Payroll allocation,2,1110,Trade Receivables,0.0,3093.08
+JE-2024-0021,2024-11-08,2024-11-08,2024-11,2024-11-08 13:33:00,rkhan,mgr_chen,System,Supplies purchase,1,6110,Office Rent Expense,36667.7,0.0
+JE-2024-0021,2024-11-08,2024-11-08,2024-11,2024-11-08 13:33:00,rkhan,mgr_chen,System,Supplies purchase,2,6120,Utilities Expense,0.0,36667.7
+JE-2024-0022,2024-11-19,2024-11-19,2024-11,2024-11-19 14:28:00,rkhan,mgr_chen,System,Inventory receipt,1,6110,Office Rent Expense,37803.87,0.0
+JE-2024-0022,2024-11-19,2024-11-19,2024-11,2024-11-19 14:28:00,rkhan,mgr_chen,System,Inventory receipt,2,5020,Freight Expense,0.0,37803.87
+JE-2024-0023,2024-11-15,2024-11-15,2024-11,2024-11-15 09:37:00,lmartin,mgr_chen,System,Monthly accrual per schedule,1,5020,Freight Expense,23353.92,0.0
+JE-2024-0023,2024-11-15,2024-11-15,2024-11,2024-11-15 09:37:00,lmartin,mgr_chen,System,Monthly accrual per schedule,2,5010,COGS - Materials,0.0,23353.92
+JE-2024-0024,2024-11-12,2024-11-12,2024-11,2024-11-12 10:57:00,bwong,mgr_chen,System,Supplies purchase,1,6110,Office Rent Expense,1513.06,0.0
+JE-2024-0024,2024-11-12,2024-11-12,2024-11,2024-11-12 10:57:00,bwong,mgr_chen,System,Supplies purchase,2,6120,Utilities Expense,0.0,1513.06
+JE-2024-0025,2024-11-22,2024-11-22,2024-11,2024-11-22 12:34:00,lmartin,mgr_olsen,System,Freight charge allocation,1,6110,Office Rent Expense,5730.64,0.0
+JE-2024-0025,2024-11-22,2024-11-22,2024-11,2024-11-22 12:34:00,lmartin,mgr_olsen,System,Freight charge allocation,2,1010,Cash - Operating,0.0,5730.64
+JE-2024-0026,2024-11-20,2024-11-20,2024-11,2024-11-20 12:06:00,rkhan,mgr_diaz,System,Rent payment,1,2010,Trade Payables,4251.71,0.0
+JE-2024-0026,2024-11-20,2024-11-20,2024-11,2024-11-20 12:06:00,rkhan,mgr_diaz,System,Rent payment,2,1010,Cash - Operating,0.0,4251.71
+JE-2024-0027,2024-11-04,2024-11-04,2024-11,2024-11-04 10:03:00,bwong,mgr_chen,System,Inventory receipt,1,6110,Office Rent Expense,17029.57,0.0
+JE-2024-0027,2024-11-04,2024-11-04,2024-11,2024-11-04 10:03:00,bwong,mgr_chen,System,Inventory receipt,2,1310,Inventory - Materials,0.0,17029.57
+JE-2024-0028,2024-11-26,2024-11-26,2024-11,2024-11-26 16:08:00,bwong,mgr_diaz,System,Inventory receipt,1,5020,Freight Expense,17834.65,0.0
+JE-2024-0028,2024-11-26,2024-11-26,2024-11,2024-11-26 16:08:00,bwong,mgr_diaz,System,Inventory receipt,2,1010,Cash - Operating,0.0,17834.65
+JE-2024-0029,2024-11-26,2024-11-26,2024-11,2024-11-26 10:03:00,lmartin,mgr_chen,System,Vendor invoice posting,1,6110,Office Rent Expense,27459.66,0.0
+JE-2024-0029,2024-11-26,2024-11-26,2024-11,2024-11-26 10:03:00,lmartin,mgr_chen,System,Vendor invoice posting,2,6010,Wages Expense,0.0,27459.66
+JE-2024-0030,2024-11-20,2024-11-20,2024-11,2024-11-20 16:30:00,rkhan,mgr_chen,System,Payroll allocation,1,2010,Trade Payables,9134.64,0.0
+JE-2024-0030,2024-11-20,2024-11-20,2024-11,2024-11-20 16:30:00,rkhan,mgr_chen,System,Payroll allocation,2,5010,COGS - Materials,0.0,9134.64
+JE-2024-0031,2024-11-19,2024-11-19,2024-11,2024-11-19 13:59:00,rkhan,mgr_diaz,System,Rent payment,1,1110,Trade Receivables,32974.15,0.0
+JE-2024-0031,2024-11-19,2024-11-19,2024-11,2024-11-19 13:59:00,rkhan,mgr_diaz,System,Rent payment,2,1010,Cash - Operating,0.0,32974.15
+JE-2024-0032,2024-11-07,2024-11-07,2024-11,2024-11-07 12:18:00,jdoe,mgr_olsen,System,Supplies purchase,1,5010,COGS - Materials,9299.9,0.0
+JE-2024-0032,2024-11-07,2024-11-07,2024-11,2024-11-07 12:18:00,jdoe,mgr_olsen,System,Supplies purchase,2,6310,Office Supplies Expense,0.0,9299.9
+JE-2024-0033,2024-11-04,2024-11-04,2024-11,2024-11-04 09:37:00,lmartin,mgr_chen,System,Monthly accrual per schedule,1,1110,Trade Receivables,20129.76,0.0
+JE-2024-0033,2024-11-04,2024-11-04,2024-11,2024-11-04 09:37:00,lmartin,mgr_chen,System,Monthly accrual per schedule,2,5020,Freight Expense,0.0,20129.76
+JE-2024-0034,2024-11-08,2024-11-08,2024-11,2024-11-08 10:38:00,asmith,mgr_diaz,System,Vendor invoice posting,1,1310,Inventory - Materials,3040.76,0.0
+JE-2024-0034,2024-11-08,2024-11-08,2024-11,2024-11-08 10:38:00,asmith,mgr_diaz,System,Vendor invoice posting,2,6110,Office Rent Expense,0.0,3040.76
+JE-2024-0035,2024-11-27,2024-11-27,2024-11,2024-11-27 09:39:00,lmartin,mgr_olsen,System,Supplies purchase,1,6310,Office Supplies Expense,3626.91,0.0
+JE-2024-0035,2024-11-27,2024-11-27,2024-11,2024-11-27 09:39:00,lmartin,mgr_olsen,System,Supplies purchase,2,6120,Utilities Expense,0.0,3626.91
+JE-2024-0036,2024-11-11,2024-11-11,2024-11,2024-11-11 14:15:00,asmith,mgr_olsen,System,Customer billing,1,1010,Cash - Operating,11302.69,0.0
+JE-2024-0036,2024-11-11,2024-11-11,2024-11,2024-11-11 14:15:00,asmith,mgr_olsen,System,Customer billing,2,6310,Office Supplies Expense,0.0,11302.69
+JE-2024-0037,2024-11-05,2024-11-05,2024-11,2024-11-05 09:29:00,lmartin,mgr_chen,System,Vendor invoice posting,1,1110,Trade Receivables,26164.46,0.0
+JE-2024-0037,2024-11-05,2024-11-05,2024-11,2024-11-05 09:29:00,lmartin,mgr_chen,System,Vendor invoice posting,2,6110,Office Rent Expense,0.0,26164.46
+JE-2024-0038,2024-11-25,2024-11-25,2024-11,2024-11-25 13:08:00,jdoe,mgr_chen,System,Utility payment,1,6120,Utilities Expense,39210.24,0.0
+JE-2024-0038,2024-11-25,2024-11-25,2024-11,2024-11-25 13:08:00,jdoe,mgr_chen,System,Utility payment,2,6010,Wages Expense,0.0,39210.24
+JE-2024-0039,2024-11-21,2024-11-21,2024-11,2024-11-21 17:45:00,lmartin,mgr_chen,System,Supplies purchase,1,6120,Utilities Expense,12845.22,0.0
+JE-2024-0039,2024-11-21,2024-11-21,2024-11,2024-11-21 17:45:00,lmartin,mgr_chen,System,Supplies purchase,2,5020,Freight Expense,0.0,12845.22
+JE-2024-0040,2024-11-07,2024-11-07,2024-11,2024-11-07 13:07:00,lmartin,mgr_chen,System,Customer billing,1,6120,Utilities Expense,37389.99,0.0
+JE-2024-0040,2024-11-07,2024-11-07,2024-11,2024-11-07 13:07:00,lmartin,mgr_chen,System,Customer billing,2,6110,Office Rent Expense,0.0,37389.99
+JE-2024-0041,2024-11-15,2024-11-15,2024-11,2024-11-15 12:43:00,bwong,mgr_olsen,System,Freight charge allocation,1,6120,Utilities Expense,26711.15,0.0
+JE-2024-0041,2024-11-15,2024-11-15,2024-11,2024-11-15 12:43:00,bwong,mgr_olsen,System,Freight charge allocation,2,5010,COGS - Materials,0.0,26711.15
+JE-2024-0042,2024-11-05,2024-11-05,2024-11,2024-11-05 15:53:00,jdoe,mgr_diaz,System,Payroll allocation,1,6120,Utilities Expense,11765.23,0.0
+JE-2024-0042,2024-11-05,2024-11-05,2024-11,2024-11-05 15:53:00,jdoe,mgr_diaz,System,Payroll allocation,2,6010,Wages Expense,0.0,11765.23
+JE-2024-0043,2024-11-21,2024-11-21,2024-11,2024-11-21 17:45:00,jdoe,mgr_chen,System,Vendor invoice posting,1,6010,Wages Expense,18077.31,0.0
+JE-2024-0043,2024-11-21,2024-11-21,2024-11,2024-11-21 17:45:00,jdoe,mgr_chen,System,Vendor invoice posting,2,1110,Trade Receivables,0.0,18077.31
+JE-2024-0044,2024-11-04,2024-11-04,2024-11,2024-11-04 14:37:00,rkhan,mgr_chen,System,Monthly accrual per schedule,1,6120,Utilities Expense,23295.55,0.0
+JE-2024-0044,2024-11-04,2024-11-04,2024-11,2024-11-04 14:37:00,rkhan,mgr_chen,System,Monthly accrual per schedule,2,6310,Office Supplies Expense,0.0,23295.55
+JE-2024-0045,2024-11-04,2024-11-04,2024-11,2024-11-04 14:13:00,jdoe,mgr_diaz,System,Supplies purchase,1,2010,Trade Payables,28710.39,0.0
+JE-2024-0045,2024-11-04,2024-11-04,2024-11,2024-11-04 14:13:00,jdoe,mgr_diaz,System,Supplies purchase,2,6010,Wages Expense,0.0,28710.39
+JE-2024-0046,2024-11-12,2024-11-12,2024-11,2024-11-12 11:51:00,rkhan,mgr_chen,System,Payroll allocation,1,6310,Office Supplies Expense,34090.26,0.0
+JE-2024-0046,2024-11-12,2024-11-12,2024-11,2024-11-12 11:51:00,rkhan,mgr_chen,System,Payroll allocation,2,2010,Trade Payables,0.0,34090.26
+JE-2024-0047,2024-11-12,2024-11-12,2024-11,2024-11-12 13:10:00,jdoe,mgr_diaz,System,Monthly accrual per schedule,1,1010,Cash - Operating,33112.25,0.0
+JE-2024-0047,2024-11-12,2024-11-12,2024-11,2024-11-12 13:10:00,jdoe,mgr_diaz,System,Monthly accrual per schedule,2,6110,Office Rent Expense,0.0,33112.25
+JE-2024-0048,2024-11-11,2024-11-11,2024-11,2024-11-11 16:22:00,asmith,mgr_chen,System,Monthly accrual per schedule,1,6110,Office Rent Expense,12956.98,0.0
+JE-2024-0048,2024-11-11,2024-11-11,2024-11,2024-11-11 16:22:00,asmith,mgr_chen,System,Monthly accrual per schedule,2,2010,Trade Payables,0.0,12956.98
+JE-2024-0049,2024-11-15,2024-11-15,2024-11,2024-11-15 13:55:00,bwong,mgr_diaz,System,Supplies purchase,1,2010,Trade Payables,3101.79,0.0
+JE-2024-0049,2024-11-15,2024-11-15,2024-11,2024-11-15 13:55:00,bwong,mgr_diaz,System,Supplies purchase,2,1110,Trade Receivables,0.0,3101.79
+JE-2024-0050,2024-11-15,2024-11-15,2024-11,2024-11-15 09:07:00,bwong,mgr_chen,System,Bank fee posting,1,6120,Utilities Expense,36860.21,0.0
+JE-2024-0050,2024-11-15,2024-11-15,2024-11,2024-11-15 09:07:00,bwong,mgr_chen,System,Bank fee posting,2,5010,COGS - Materials,0.0,36860.21
+JE-2024-0051,2024-11-06,2024-11-06,2024-11,2024-11-06 15:22:00,bwong,mgr_diaz,System,Bank fee posting,1,1110,Trade Receivables,30653.18,0.0
+JE-2024-0051,2024-11-06,2024-11-06,2024-11,2024-11-06 15:22:00,bwong,mgr_diaz,System,Bank fee posting,2,5020,Freight Expense,0.0,30653.18
+JE-2024-0052,2024-11-19,2024-11-19,2024-11,2024-11-19 12:16:00,rkhan,mgr_chen,System,Supplies purchase,1,1110,Trade Receivables,2055.36,0.0
+JE-2024-0052,2024-11-19,2024-11-19,2024-11,2024-11-19 12:16:00,rkhan,mgr_chen,System,Supplies purchase,2,6110,Office Rent Expense,0.0,2055.36
+JE-2024-0053,2024-11-18,2024-11-18,2024-11,2024-11-18 15:04:00,bwong,mgr_olsen,System,Utility payment,1,5020,Freight Expense,39862.95,0.0
+JE-2024-0053,2024-11-18,2024-11-18,2024-11,2024-11-18 15:04:00,bwong,mgr_olsen,System,Utility payment,2,6120,Utilities Expense,0.0,39862.95
+JE-2024-0054,2024-11-25,2024-11-25,2024-11,2024-11-25 13:42:00,rkhan,mgr_olsen,System,Customer billing,1,1110,Trade Receivables,17270.82,0.0
+JE-2024-0054,2024-11-25,2024-11-25,2024-11,2024-11-25 13:42:00,rkhan,mgr_olsen,System,Customer billing,2,6010,Wages Expense,0.0,17270.82
+JE-2024-0055,2024-11-11,2024-11-11,2024-11,2024-11-11 15:42:00,asmith,mgr_olsen,System,Bank fee posting,1,6120,Utilities Expense,39507.2,0.0
+JE-2024-0055,2024-11-11,2024-11-11,2024-11,2024-11-11 15:42:00,asmith,mgr_olsen,System,Bank fee posting,2,2010,Trade Payables,0.0,39507.2
+JE-2024-0056,2024-11-26,2024-11-26,2024-11,2024-11-26 09:19:00,rkhan,mgr_olsen,System,Bank fee posting,1,6310,Office Supplies Expense,12192.99,0.0
+JE-2024-0056,2024-11-26,2024-11-26,2024-11,2024-11-26 09:19:00,rkhan,mgr_olsen,System,Bank fee posting,2,1010,Cash - Operating,0.0,12192.99
+JE-2024-0057,2024-11-21,2024-11-21,2024-11,2024-11-21 16:43:00,rkhan,mgr_olsen,System,Payroll allocation,1,5020,Freight Expense,9132.72,0.0
+JE-2024-0057,2024-11-21,2024-11-21,2024-11,2024-11-21 16:43:00,rkhan,mgr_olsen,System,Payroll allocation,2,6120,Utilities Expense,0.0,9132.72
+JE-2024-0058,2024-11-25,2024-11-25,2024-11,2024-11-25 14:05:00,asmith,mgr_olsen,System,Customer billing,1,6110,Office Rent Expense,34410.1,0.0
+JE-2024-0058,2024-11-25,2024-11-25,2024-11,2024-11-25 14:05:00,asmith,mgr_olsen,System,Customer billing,2,1310,Inventory - Materials,0.0,34410.1
+JE-2024-0059,2024-11-07,2024-11-07,2024-11,2024-11-07 09:02:00,rkhan,mgr_olsen,System,Vendor invoice posting,1,1010,Cash - Operating,10434.42,0.0
+JE-2024-0059,2024-11-07,2024-11-07,2024-11,2024-11-07 09:02:00,rkhan,mgr_olsen,System,Vendor invoice posting,2,2010,Trade Payables,0.0,10434.42
+JE-2024-0060,2024-11-27,2024-11-27,2024-11,2024-11-27 12:45:00,rkhan,mgr_diaz,System,Inventory receipt,1,6010,Wages Expense,29307.61,0.0
+JE-2024-0060,2024-11-27,2024-11-27,2024-11,2024-11-27 12:45:00,rkhan,mgr_diaz,System,Inventory receipt,2,5010,COGS - Materials,0.0,29307.61
+JE-2024-0061,2024-11-06,2024-11-06,2024-11,2024-11-06 15:14:00,lmartin,mgr_diaz,System,Monthly accrual per schedule,1,1110,Trade Receivables,7552.06,0.0
+JE-2024-0061,2024-11-06,2024-11-06,2024-11,2024-11-06 15:14:00,lmartin,mgr_diaz,System,Monthly accrual per schedule,2,6110,Office Rent Expense,0.0,7552.06
+JE-2024-0062,2024-11-06,2024-11-06,2024-11,2024-11-06 16:08:00,lmartin,mgr_olsen,System,Bank fee posting,1,6310,Office Supplies Expense,33699.21,0.0
+JE-2024-0062,2024-11-06,2024-11-06,2024-11,2024-11-06 16:08:00,lmartin,mgr_olsen,System,Bank fee posting,2,1010,Cash - Operating,0.0,33699.21
+JE-2024-0063,2024-11-25,2024-11-25,2024-11,2024-11-25 15:53:00,rkhan,mgr_chen,System,Freight charge allocation,1,1010,Cash - Operating,38106.53,0.0
+JE-2024-0063,2024-11-25,2024-11-25,2024-11,2024-11-25 15:53:00,rkhan,mgr_chen,System,Freight charge allocation,2,6120,Utilities Expense,0.0,38106.53
+JE-2024-0064,2024-11-12,2024-11-12,2024-11,2024-11-12 13:49:00,rkhan,mgr_olsen,System,Inventory receipt,1,6120,Utilities Expense,32706.81,0.0
+JE-2024-0064,2024-11-12,2024-11-12,2024-11,2024-11-12 13:49:00,rkhan,mgr_olsen,System,Inventory receipt,2,1010,Cash - Operating,0.0,32706.81
+JE-2024-0065,2024-11-05,2024-11-05,2024-11,2024-11-05 13:15:00,bwong,mgr_olsen,System,Vendor invoice posting,1,6010,Wages Expense,11557.69,0.0
+JE-2024-0065,2024-11-05,2024-11-05,2024-11,2024-11-05 13:15:00,bwong,mgr_olsen,System,Vendor invoice posting,2,1310,Inventory - Materials,0.0,11557.69
+JE-2024-0066,2024-11-12,2024-11-12,2024-11,2024-11-12 15:44:00,asmith,mgr_chen,System,Rent payment,1,2010,Trade Payables,6587.26,0.0
+JE-2024-0066,2024-11-12,2024-11-12,2024-11,2024-11-12 15:44:00,asmith,mgr_chen,System,Rent payment,2,6310,Office Supplies Expense,0.0,6587.26
+JE-2024-0067,2024-11-26,2024-11-26,2024-11,2024-11-26 16:26:00,rkhan,mgr_diaz,System,Bank fee posting,1,5010,COGS - Materials,2802.71,0.0
+JE-2024-0067,2024-11-26,2024-11-26,2024-11,2024-11-26 16:26:00,rkhan,mgr_diaz,System,Bank fee posting,2,2010,Trade Payables,0.0,2802.71
+JE-2024-0068,2024-11-22,2024-11-22,2024-11,2024-11-22 09:22:00,rkhan,mgr_diaz,System,Supplies purchase,1,1110,Trade Receivables,12682.01,0.0
+JE-2024-0068,2024-11-22,2024-11-22,2024-11,2024-11-22 09:22:00,rkhan,mgr_diaz,System,Supplies purchase,2,6110,Office Rent Expense,0.0,12682.01
+JE-2024-0069,2024-11-22,2024-11-22,2024-11,2024-11-22 12:17:00,jdoe,mgr_diaz,System,Utility payment,1,2010,Trade Payables,18417.94,0.0
+JE-2024-0069,2024-11-22,2024-11-22,2024-11,2024-11-22 12:17:00,jdoe,mgr_diaz,System,Utility payment,2,6010,Wages Expense,0.0,18417.94
+JE-2024-0070,2024-11-21,2024-11-21,2024-11,2024-11-21 11:39:00,rkhan,mgr_olsen,System,Bank fee posting,1,5010,COGS - Materials,22526.37,0.0
+JE-2024-0070,2024-11-21,2024-11-21,2024-11,2024-11-21 11:39:00,rkhan,mgr_olsen,System,Bank fee posting,2,5020,Freight Expense,0.0,22526.37
+JE-2024-0071,2024-11-20,2024-11-20,2024-11,2024-11-20 11:55:00,jdoe,mgr_diaz,System,Rent payment,1,6310,Office Supplies Expense,19498.99,0.0
+JE-2024-0071,2024-11-20,2024-11-20,2024-11,2024-11-20 11:55:00,jdoe,mgr_diaz,System,Rent payment,2,6110,Office Rent Expense,0.0,19498.99
+JE-2024-0072,2024-11-21,2024-11-21,2024-11,2024-11-21 14:21:00,rkhan,mgr_diaz,System,Rent payment,1,6120,Utilities Expense,32019.4,0.0
+JE-2024-0072,2024-11-21,2024-11-21,2024-11,2024-11-21 14:21:00,rkhan,mgr_diaz,System,Rent payment,2,5020,Freight Expense,0.0,32019.4
+JE-2024-0073,2024-11-22,2024-11-22,2024-11,2024-11-22 09:47:00,bwong,mgr_chen,System,Vendor invoice posting,1,5010,COGS - Materials,22747.72,0.0
+JE-2024-0073,2024-11-22,2024-11-22,2024-11,2024-11-22 09:47:00,bwong,mgr_chen,System,Vendor invoice posting,2,1310,Inventory - Materials,0.0,22747.72
+JE-2024-0074,2024-11-12,2024-11-12,2024-11,2024-11-12 12:53:00,asmith,mgr_chen,System,Payroll allocation,1,1010,Cash - Operating,1051.88,0.0
+JE-2024-0074,2024-11-12,2024-11-12,2024-11,2024-11-12 12:53:00,asmith,mgr_chen,System,Payroll allocation,2,5020,Freight Expense,0.0,1051.88
+JE-2024-0075,2024-11-27,2024-11-27,2024-11,2024-11-27 12:29:00,bwong,mgr_chen,System,Bank fee posting,1,1310,Inventory - Materials,29437.64,0.0
+JE-2024-0075,2024-11-27,2024-11-27,2024-11,2024-11-27 12:29:00,bwong,mgr_chen,System,Bank fee posting,2,5020,Freight Expense,0.0,29437.64
+JE-2024-0076,2024-11-08,2024-11-08,2024-11,2024-11-08 13:06:00,bwong,mgr_olsen,System,Rent payment,1,2010,Trade Payables,24389.02,0.0
+JE-2024-0076,2024-11-08,2024-11-08,2024-11,2024-11-08 13:06:00,bwong,mgr_olsen,System,Rent payment,2,6110,Office Rent Expense,0.0,24389.02
+JE-2024-0077,2024-11-05,2024-11-05,2024-11,2024-11-05 12:06:00,bwong,mgr_olsen,System,Bank fee posting,1,5020,Freight Expense,29342.67,0.0
+JE-2024-0077,2024-11-05,2024-11-05,2024-11,2024-11-05 12:06:00,bwong,mgr_olsen,System,Bank fee posting,2,5010,COGS - Materials,0.0,29342.67
+JE-2024-0078,2024-11-18,2024-11-18,2024-11,2024-11-18 17:27:00,jdoe,mgr_olsen,System,Utility payment,1,5010,COGS - Materials,27851.59,0.0
+JE-2024-0078,2024-11-18,2024-11-18,2024-11,2024-11-18 17:27:00,jdoe,mgr_olsen,System,Utility payment,2,2010,Trade Payables,0.0,27851.59
+JE-2024-0079,2024-11-22,2024-11-22,2024-11,2024-11-22 10:27:00,rkhan,mgr_olsen,System,Payroll allocation,1,2010,Trade Payables,40360.92,0.0
+JE-2024-0079,2024-11-22,2024-11-22,2024-11,2024-11-22 10:27:00,rkhan,mgr_olsen,System,Payroll allocation,2,6010,Wages Expense,0.0,40360.92
+JE-2024-0080,2024-11-25,2024-11-25,2024-11,2024-11-25 13:39:00,lmartin,mgr_diaz,System,Freight charge allocation,1,2010,Trade Payables,33982.73,0.0
+JE-2024-0080,2024-11-25,2024-11-25,2024-11,2024-11-25 13:39:00,lmartin,mgr_diaz,System,Freight charge allocation,2,6120,Utilities Expense,0.0,33982.73
+JE-2024-0081,2024-11-15,2024-11-15,2024-11,2024-11-15 12:53:00,bwong,mgr_diaz,System,Inventory receipt,1,1010,Cash - Operating,39267.19,0.0
+JE-2024-0081,2024-11-15,2024-11-15,2024-11,2024-11-15 12:53:00,bwong,mgr_diaz,System,Inventory receipt,2,2010,Trade Payables,0.0,39267.19
+JE-2024-0082,2024-11-15,2024-11-15,2024-11,2024-11-15 09:31:00,asmith,mgr_diaz,System,Inventory receipt,1,6310,Office Supplies Expense,35769.83,0.0
+JE-2024-0082,2024-11-15,2024-11-15,2024-11,2024-11-15 09:31:00,asmith,mgr_diaz,System,Inventory receipt,2,6120,Utilities Expense,0.0,35769.83
+JE-2024-0083,2024-11-15,2024-11-15,2024-11,2024-11-15 13:56:00,bwong,mgr_olsen,System,Monthly accrual per schedule,1,1110,Trade Receivables,25119.28,0.0
+JE-2024-0083,2024-11-15,2024-11-15,2024-11,2024-11-15 13:56:00,bwong,mgr_olsen,System,Monthly accrual per schedule,2,6110,Office Rent Expense,0.0,25119.28
+JE-2024-0084,2024-11-05,2024-11-05,2024-11,2024-11-05 12:46:00,lmartin,mgr_chen,System,Freight charge allocation,1,1010,Cash - Operating,17188.7,0.0
+JE-2024-0084,2024-11-05,2024-11-05,2024-11,2024-11-05 12:46:00,lmartin,mgr_chen,System,Freight charge allocation,2,1310,Inventory - Materials,0.0,17188.7
+JE-2024-0085,2024-11-01,2024-11-01,2024-11,2024-11-01 10:18:00,asmith,mgr_diaz,System,Bank fee posting,1,6310,Office Supplies Expense,9462.73,0.0
+JE-2024-0085,2024-11-01,2024-11-01,2024-11,2024-11-01 10:18:00,asmith,mgr_diaz,System,Bank fee posting,2,1010,Cash - Operating,0.0,9462.73
+JE-2024-0086,2024-11-26,2024-11-26,2024-11,2024-11-26 17:22:00,lmartin,mgr_diaz,System,Utility payment,1,1010,Cash - Operating,17986.06,0.0
+JE-2024-0086,2024-11-26,2024-11-26,2024-11,2024-11-26 17:22:00,lmartin,mgr_diaz,System,Utility payment,2,6120,Utilities Expense,0.0,17986.06
+JE-2024-0087,2024-11-14,2024-11-14,2024-11,2024-11-14 13:14:00,asmith,mgr_diaz,System,Vendor invoice posting,1,1110,Trade Receivables,5243.42,0.0
+JE-2024-0087,2024-11-14,2024-11-14,2024-11,2024-11-14 13:14:00,asmith,mgr_diaz,System,Vendor invoice posting,2,6010,Wages Expense,0.0,5243.42
+JE-2024-0088,2024-11-11,2024-11-11,2024-11,2024-11-11 12:47:00,lmartin,mgr_olsen,System,Bank fee posting,1,6120,Utilities Expense,20439.5,0.0
+JE-2024-0088,2024-11-11,2024-11-11,2024-11,2024-11-11 12:47:00,lmartin,mgr_olsen,System,Bank fee posting,2,5020,Freight Expense,0.0,20439.5
+JE-2024-0089,2024-11-11,2024-11-11,2024-11,2024-11-11 13:14:00,bwong,mgr_chen,System,Supplies purchase,1,6010,Wages Expense,15284.83,0.0
+JE-2024-0089,2024-11-11,2024-11-11,2024-11,2024-11-11 13:14:00,bwong,mgr_chen,System,Supplies purchase,2,6120,Utilities Expense,0.0,15284.83
+JE-2024-0090,2024-11-04,2024-11-04,2024-11,2024-11-04 09:35:00,asmith,mgr_olsen,System,Freight charge allocation,1,5020,Freight Expense,12411.31,0.0
+JE-2024-0090,2024-11-04,2024-11-04,2024-11,2024-11-04 09:35:00,asmith,mgr_olsen,System,Freight charge allocation,2,5010,COGS - Materials,0.0,12411.31
+JE-2024-0091,2024-11-27,2024-11-27,2024-11,2024-11-27 13:30:00,bwong,mgr_chen,System,Monthly accrual per schedule,1,6120,Utilities Expense,20210.25,0.0
+JE-2024-0091,2024-11-27,2024-11-27,2024-11,2024-11-27 13:30:00,bwong,mgr_chen,System,Monthly accrual per schedule,2,1010,Cash - Operating,0.0,20210.25
+JE-2024-0092,2024-11-06,2024-11-06,2024-11,2024-11-06 10:25:00,lmartin,mgr_olsen,System,Monthly accrual per schedule,1,6010,Wages Expense,20755.01,0.0
+JE-2024-0092,2024-11-06,2024-11-06,2024-11,2024-11-06 10:25:00,lmartin,mgr_olsen,System,Monthly accrual per schedule,2,1310,Inventory - Materials,0.0,20755.01
+JE-2024-0093,2024-11-27,2024-11-27,2024-11,2024-11-27 13:05:00,jdoe,mgr_olsen,System,Rent payment,1,1310,Inventory - Materials,41745.78,0.0
+JE-2024-0093,2024-11-27,2024-11-27,2024-11,2024-11-27 13:05:00,jdoe,mgr_olsen,System,Rent payment,2,6110,Office Rent Expense,0.0,41745.78
+JE-2024-0094,2024-11-25,2024-11-25,2024-11,2024-11-25 15:28:00,bwong,mgr_olsen,System,Rent payment,1,6120,Utilities Expense,38175.48,0.0
+JE-2024-0094,2024-11-25,2024-11-25,2024-11,2024-11-25 15:28:00,bwong,mgr_olsen,System,Rent payment,2,5010,COGS - Materials,0.0,38175.48
+JE-2024-0095,2024-11-06,2024-11-06,2024-11,2024-11-06 12:40:00,jdoe,mgr_chen,System,Inventory receipt,1,6010,Wages Expense,9020.85,0.0
+JE-2024-0095,2024-11-06,2024-11-06,2024-11,2024-11-06 12:40:00,jdoe,mgr_chen,System,Inventory receipt,2,1110,Trade Receivables,0.0,9020.85
+JE-2024-0096,2024-11-05,2024-11-05,2024-11,2024-11-05 11:00:00,lmartin,mgr_diaz,System,Customer billing,1,5010,COGS - Materials,17276.03,0.0
+JE-2024-0096,2024-11-05,2024-11-05,2024-11,2024-11-05 11:00:00,lmartin,mgr_diaz,System,Customer billing,2,6110,Office Rent Expense,0.0,17276.03
+JE-2024-0097,2024-11-14,2024-11-14,2024-11,2024-11-14 13:44:00,jdoe,mgr_olsen,System,Inventory receipt,1,6120,Utilities Expense,36131.56,0.0
+JE-2024-0097,2024-11-14,2024-11-14,2024-11,2024-11-14 13:44:00,jdoe,mgr_olsen,System,Inventory receipt,2,6110,Office Rent Expense,0.0,36131.56
+JE-2024-0098,2024-11-20,2024-11-20,2024-11,2024-11-20 10:34:00,asmith,mgr_diaz,System,Payroll allocation,1,5020,Freight Expense,9597.04,0.0
+JE-2024-0098,2024-11-20,2024-11-20,2024-11,2024-11-20 10:34:00,asmith,mgr_diaz,System,Payroll allocation,2,5010,COGS - Materials,0.0,9597.04
+JE-2024-0099,2024-11-08,2024-11-08,2024-11,2024-11-08 13:38:00,lmartin,mgr_diaz,System,Freight charge allocation,1,5020,Freight Expense,31506.43,0.0
+JE-2024-0099,2024-11-08,2024-11-08,2024-11,2024-11-08 13:38:00,lmartin,mgr_diaz,System,Freight charge allocation,2,1010,Cash - Operating,0.0,31506.43
+JE-2024-0100,2024-11-14,2024-11-14,2024-11,2024-11-14 15:17:00,rkhan,mgr_diaz,System,Vendor invoice posting,1,1310,Inventory - Materials,21119.74,0.0
+JE-2024-0100,2024-11-14,2024-11-14,2024-11,2024-11-14 15:17:00,rkhan,mgr_diaz,System,Vendor invoice posting,2,5010,COGS - Materials,0.0,21119.74
+JE-2024-0101,2024-11-20,2024-11-20,2024-11,2024-11-20 14:38:00,jdoe,mgr_chen,System,Bank fee posting,1,1310,Inventory - Materials,10665.38,0.0
+JE-2024-0101,2024-11-20,2024-11-20,2024-11,2024-11-20 14:38:00,jdoe,mgr_chen,System,Bank fee posting,2,5010,COGS - Materials,0.0,10665.38
+JE-2024-0102,2024-11-13,2024-11-13,2024-11,2024-11-13 09:48:00,rkhan,mgr_olsen,System,Freight charge allocation,1,6120,Utilities Expense,31812.04,0.0
+JE-2024-0102,2024-11-13,2024-11-13,2024-11,2024-11-13 09:48:00,rkhan,mgr_olsen,System,Freight charge allocation,2,6010,Wages Expense,0.0,31812.04
+JE-2024-0103,2024-11-27,2024-11-27,2024-11,2024-11-27 15:40:00,jdoe,mgr_diaz,System,Utility payment,1,2010,Trade Payables,34235.44,0.0
+JE-2024-0103,2024-11-27,2024-11-27,2024-11,2024-11-27 15:40:00,jdoe,mgr_diaz,System,Utility payment,2,6310,Office Supplies Expense,0.0,34235.44
+JE-2024-0104,2024-11-15,2024-11-15,2024-11,2024-11-15 10:54:00,rkhan,mgr_olsen,System,Freight charge allocation,1,6120,Utilities Expense,6922.48,0.0
+JE-2024-0104,2024-11-15,2024-11-15,2024-11,2024-11-15 10:54:00,rkhan,mgr_olsen,System,Freight charge allocation,2,2010,Trade Payables,0.0,6922.48
+JE-2024-0105,2024-11-26,2024-11-26,2024-11,2024-11-26 09:29:00,bwong,mgr_diaz,System,Vendor invoice posting,1,2010,Trade Payables,3880.9,0.0
+JE-2024-0105,2024-11-26,2024-11-26,2024-11,2024-11-26 09:29:00,bwong,mgr_diaz,System,Vendor invoice posting,2,1110,Trade Receivables,0.0,3880.9
+JE-2024-0106,2024-11-01,2024-11-01,2024-11,2024-11-01 17:29:00,asmith,mgr_olsen,System,Utility payment,1,1310,Inventory - Materials,17473.75,0.0
+JE-2024-0106,2024-11-01,2024-11-01,2024-11,2024-11-01 17:29:00,asmith,mgr_olsen,System,Utility payment,2,1010,Cash - Operating,0.0,17473.75
+JE-2024-0107,2024-11-21,2024-11-21,2024-11,2024-11-21 09:13:00,asmith,mgr_diaz,System,Freight charge allocation,1,1010,Cash - Operating,11362.95,0.0
+JE-2024-0107,2024-11-21,2024-11-21,2024-11,2024-11-21 09:13:00,asmith,mgr_diaz,System,Freight charge allocation,2,5020,Freight Expense,0.0,11362.95
+JE-2024-0108,2024-11-01,2024-11-01,2024-11,2024-11-01 12:45:00,lmartin,mgr_chen,System,Supplies purchase,1,2010,Trade Payables,6820.21,0.0
+JE-2024-0108,2024-11-01,2024-11-01,2024-11,2024-11-01 12:45:00,lmartin,mgr_chen,System,Supplies purchase,2,5020,Freight Expense,0.0,6820.21
+JE-2024-0109,2024-11-12,2024-11-12,2024-11,2024-11-12 10:29:00,asmith,mgr_diaz,System,Customer billing,1,1110,Trade Receivables,39787.14,0.0
+JE-2024-0109,2024-11-12,2024-11-12,2024-11,2024-11-12 10:29:00,asmith,mgr_diaz,System,Customer billing,2,6120,Utilities Expense,0.0,39787.14
+JE-2024-0110,2024-11-20,2024-11-20,2024-11,2024-11-20 16:30:00,lmartin,mgr_chen,System,Rent payment,1,6110,Office Rent Expense,10387.95,0.0
+JE-2024-0110,2024-11-20,2024-11-20,2024-11,2024-11-20 16:30:00,lmartin,mgr_chen,System,Rent payment,2,1110,Trade Receivables,0.0,10387.95
+JE-2024-0111,2024-11-07,2024-11-07,2024-11,2024-11-07 10:17:00,rkhan,mgr_diaz,System,Supplies purchase,1,6120,Utilities Expense,32497.82,0.0
+JE-2024-0111,2024-11-07,2024-11-07,2024-11,2024-11-07 10:17:00,rkhan,mgr_diaz,System,Supplies purchase,2,5010,COGS - Materials,0.0,32497.82
+JE-2024-0112,2024-11-14,2024-11-14,2024-11,2024-11-14 13:53:00,rkhan,mgr_chen,System,Freight charge allocation,1,1110,Trade Receivables,24734.0,0.0
+JE-2024-0112,2024-11-14,2024-11-14,2024-11,2024-11-14 13:53:00,rkhan,mgr_chen,System,Freight charge allocation,2,1010,Cash - Operating,0.0,24734.0
+JE-2024-0113,2024-11-18,2024-11-18,2024-11,2024-11-18 14:35:00,rkhan,mgr_diaz,System,Utility payment,1,6110,Office Rent Expense,32088.08,0.0
+JE-2024-0113,2024-11-18,2024-11-18,2024-11,2024-11-18 14:35:00,rkhan,mgr_diaz,System,Utility payment,2,1310,Inventory - Materials,0.0,32088.08
+JE-2024-0114,2024-11-27,2024-11-27,2024-11,2024-11-27 15:14:00,rkhan,mgr_chen,System,Utility payment,1,1010,Cash - Operating,35981.34,0.0
+JE-2024-0114,2024-11-27,2024-11-27,2024-11,2024-11-27 15:14:00,rkhan,mgr_chen,System,Utility payment,2,2010,Trade Payables,0.0,35981.34
+JE-2024-0115,2024-11-19,2024-11-19,2024-11,2024-11-19 11:31:00,asmith,mgr_olsen,System,Bank fee posting,1,6310,Office Supplies Expense,40529.66,0.0
+JE-2024-0115,2024-11-19,2024-11-19,2024-11,2024-11-19 11:31:00,asmith,mgr_olsen,System,Bank fee posting,2,5020,Freight Expense,0.0,40529.66
+JE-2024-0116,2024-11-21,2024-11-21,2024-11,2024-11-21 10:33:00,jdoe,mgr_olsen,System,Payroll allocation,1,2010,Trade Payables,38256.46,0.0
+JE-2024-0116,2024-11-21,2024-11-21,2024-11,2024-11-21 10:33:00,jdoe,mgr_olsen,System,Payroll allocation,2,6010,Wages Expense,0.0,38256.46
+JE-2024-0117,2024-11-05,2024-11-05,2024-11,2024-11-05 16:50:00,bwong,mgr_olsen,System,Rent payment,1,5020,Freight Expense,40712.71,0.0
+JE-2024-0117,2024-11-05,2024-11-05,2024-11,2024-11-05 16:50:00,bwong,mgr_olsen,System,Rent payment,2,6310,Office Supplies Expense,0.0,40712.71
+JE-2024-0118,2024-11-26,2024-11-26,2024-11,2024-11-26 15:20:00,rkhan,mgr_olsen,System,Monthly accrual per schedule,1,1310,Inventory - Materials,26400.21,0.0
+JE-2024-0118,2024-11-26,2024-11-26,2024-11,2024-11-26 15:20:00,rkhan,mgr_olsen,System,Monthly accrual per schedule,2,5020,Freight Expense,0.0,26400.21
+JE-2024-0119,2024-11-12,2024-11-12,2024-11,2024-11-12 13:14:00,rkhan,mgr_chen,System,Vendor invoice posting,1,1010,Cash - Operating,31414.83,0.0
+JE-2024-0119,2024-11-12,2024-11-12,2024-11,2024-11-12 13:14:00,rkhan,mgr_chen,System,Vendor invoice posting,2,6010,Wages Expense,0.0,31414.83
+JE-2024-0120,2024-11-14,2024-11-14,2024-11,2024-11-14 09:02:00,jdoe,mgr_diaz,System,Utility payment,1,6310,Office Supplies Expense,13758.86,0.0
+JE-2024-0120,2024-11-14,2024-11-14,2024-11,2024-11-14 09:02:00,jdoe,mgr_diaz,System,Utility payment,2,2010,Trade Payables,0.0,13758.86
+JE-2024-0121,2024-11-07,2024-11-07,2024-11,2024-11-07 12:33:00,asmith,mgr_chen,System,Payroll allocation,1,5020,Freight Expense,17423.76,0.0
+JE-2024-0121,2024-11-07,2024-11-07,2024-11,2024-11-07 12:33:00,asmith,mgr_chen,System,Payroll allocation,2,2010,Trade Payables,0.0,17423.76
+JE-2024-0122,2024-11-12,2024-11-12,2024-11,2024-11-12 16:58:00,asmith,mgr_diaz,System,Customer billing,1,1010,Cash - Operating,24575.97,0.0
+JE-2024-0122,2024-11-12,2024-11-12,2024-11,2024-11-12 16:58:00,asmith,mgr_diaz,System,Customer billing,2,6120,Utilities Expense,0.0,24575.97
+JE-2024-0123,2024-11-01,2024-11-01,2024-11,2024-11-01 16:57:00,lmartin,mgr_chen,System,Vendor invoice posting,1,1010,Cash - Operating,12223.0,0.0
+JE-2024-0123,2024-11-01,2024-11-01,2024-11,2024-11-01 16:57:00,lmartin,mgr_chen,System,Vendor invoice posting,2,6310,Office Supplies Expense,0.0,12223.0
+JE-2024-0124,2024-11-27,2024-11-27,2024-11,2024-11-27 13:40:00,bwong,mgr_diaz,System,Customer billing,1,6110,Office Rent Expense,40412.82,0.0
+JE-2024-0124,2024-11-27,2024-11-27,2024-11,2024-11-27 13:40:00,bwong,mgr_diaz,System,Customer billing,2,2010,Trade Payables,0.0,40412.82
+JE-2024-0125,2024-11-22,2024-11-22,2024-11,2024-11-22 10:15:00,bwong,mgr_olsen,System,Customer billing,1,6120,Utilities Expense,16141.03,0.0
+JE-2024-0125,2024-11-22,2024-11-22,2024-11,2024-11-22 10:15:00,bwong,mgr_olsen,System,Customer billing,2,5010,COGS - Materials,0.0,16141.03
+JE-2024-0126,2024-11-19,2024-11-19,2024-11,2024-11-19 13:00:00,jdoe,mgr_olsen,System,Freight charge allocation,1,6120,Utilities Expense,23855.83,0.0
+JE-2024-0126,2024-11-19,2024-11-19,2024-11,2024-11-19 13:00:00,jdoe,mgr_olsen,System,Freight charge allocation,2,6110,Office Rent Expense,0.0,23855.83
+JE-2024-0127,2024-11-18,2024-11-18,2024-11,2024-11-18 12:40:00,bwong,mgr_olsen,System,Payroll allocation,1,5020,Freight Expense,8147.52,0.0
+JE-2024-0127,2024-11-18,2024-11-18,2024-11,2024-11-18 12:40:00,bwong,mgr_olsen,System,Payroll allocation,2,5010,COGS - Materials,0.0,8147.52
+JE-2024-0128,2024-11-14,2024-11-14,2024-11,2024-11-14 16:02:00,asmith,mgr_chen,System,Customer billing,1,6310,Office Supplies Expense,24426.19,0.0
+JE-2024-0128,2024-11-14,2024-11-14,2024-11,2024-11-14 16:02:00,asmith,mgr_chen,System,Customer billing,2,2010,Trade Payables,0.0,24426.19
+JE-2024-0129,2024-11-08,2024-11-08,2024-11,2024-11-08 12:08:00,bwong,mgr_olsen,System,Supplies purchase,1,6120,Utilities Expense,33076.24,0.0
+JE-2024-0129,2024-11-08,2024-11-08,2024-11,2024-11-08 12:08:00,bwong,mgr_olsen,System,Supplies purchase,2,6010,Wages Expense,0.0,33076.24
+JE-2024-0130,2024-11-13,2024-11-13,2024-11,2024-11-13 16:51:00,bwong,mgr_chen,System,Freight charge allocation,1,5020,Freight Expense,12536.91,0.0
+JE-2024-0130,2024-11-13,2024-11-13,2024-11,2024-11-13 16:51:00,bwong,mgr_chen,System,Freight charge allocation,2,6010,Wages Expense,0.0,12536.91
+JE-2024-0131,2024-11-12,2024-11-12,2024-11,2024-11-12 15:54:00,bwong,mgr_chen,System,Rent payment,1,5010,COGS - Materials,33831.76,0.0
+JE-2024-0131,2024-11-12,2024-11-12,2024-11,2024-11-12 15:54:00,bwong,mgr_chen,System,Rent payment,2,6120,Utilities Expense,0.0,33831.76
+JE-2024-0132,2024-11-26,2024-11-26,2024-11,2024-11-26 10:29:00,bwong,mgr_olsen,System,Rent payment,1,6310,Office Supplies Expense,15606.88,0.0
+JE-2024-0132,2024-11-26,2024-11-26,2024-11,2024-11-26 10:29:00,bwong,mgr_olsen,System,Rent payment,2,5020,Freight Expense,0.0,15606.88
+JE-2024-0133,2024-11-12,2024-11-12,2024-11,2024-11-12 16:01:00,lmartin,mgr_diaz,System,Bank fee posting,1,6110,Office Rent Expense,26097.06,0.0
+JE-2024-0133,2024-11-12,2024-11-12,2024-11,2024-11-12 16:01:00,lmartin,mgr_diaz,System,Bank fee posting,2,5020,Freight Expense,0.0,26097.06
+JE-2024-0134,2024-11-21,2024-11-21,2024-11,2024-11-21 13:41:00,asmith,mgr_chen,System,Monthly accrual per schedule,1,6120,Utilities Expense,17266.77,0.0
+JE-2024-0134,2024-11-21,2024-11-21,2024-11,2024-11-21 13:41:00,asmith,mgr_chen,System,Monthly accrual per schedule,2,1010,Cash - Operating,0.0,17266.77
+JE-2024-0135,2024-11-06,2024-11-06,2024-11,2024-11-06 10:15:00,asmith,mgr_diaz,System,Freight charge allocation,1,6310,Office Supplies Expense,37287.44,0.0
+JE-2024-0135,2024-11-06,2024-11-06,2024-11,2024-11-06 10:15:00,asmith,mgr_diaz,System,Freight charge allocation,2,1110,Trade Receivables,0.0,37287.44
+JE-2024-0136,2024-11-20,2024-11-20,2024-11,2024-11-20 11:56:00,jdoe,mgr_diaz,System,Bank fee posting,1,2010,Trade Payables,17542.17,0.0
+JE-2024-0136,2024-11-20,2024-11-20,2024-11,2024-11-20 11:56:00,jdoe,mgr_diaz,System,Bank fee posting,2,6120,Utilities Expense,0.0,17542.17
+JE-2024-0137,2024-11-04,2024-11-04,2024-11,2024-11-04 14:13:00,asmith,mgr_diaz,System,Vendor invoice posting,1,6310,Office Supplies Expense,18733.41,0.0
+JE-2024-0137,2024-11-04,2024-11-04,2024-11,2024-11-04 14:13:00,asmith,mgr_diaz,System,Vendor invoice posting,2,1110,Trade Receivables,0.0,18733.41
+JE-2024-0138,2024-11-18,2024-11-18,2024-11,2024-11-18 09:25:00,jdoe,mgr_diaz,System,Vendor invoice posting,1,6110,Office Rent Expense,11731.84,0.0
+JE-2024-0138,2024-11-18,2024-11-18,2024-11,2024-11-18 09:25:00,jdoe,mgr_diaz,System,Vendor invoice posting,2,5010,COGS - Materials,0.0,11731.84
+JE-2024-0139,2024-11-04,2024-11-04,2024-11,2024-11-04 14:15:00,lmartin,mgr_chen,System,Vendor invoice posting,1,1110,Trade Receivables,41532.71,0.0
+JE-2024-0139,2024-11-04,2024-11-04,2024-11,2024-11-04 14:15:00,lmartin,mgr_chen,System,Vendor invoice posting,2,6110,Office Rent Expense,0.0,41532.71
+JE-2024-0140,2024-11-27,2024-11-27,2024-11,2024-11-27 12:52:00,bwong,mgr_chen,System,Bank fee posting,1,5010,COGS - Materials,36553.27,0.0
+JE-2024-0140,2024-11-27,2024-11-27,2024-11,2024-11-27 12:52:00,bwong,mgr_chen,System,Bank fee posting,2,6120,Utilities Expense,0.0,36553.27
+JE-2024-0141,2024-11-23,2024-11-23,2024-11,2024-11-23 11:08:00,lmartin,mgr_diaz,System,Vendor invoice posting,1,6310,Office Supplies Expense,12345.67,0.0
+JE-2024-0141,2024-11-23,2024-11-23,2024-11,2024-11-23 11:08:00,lmartin,mgr_diaz,System,Vendor invoice posting,2,2010,Trade Payables,0.0,12345.67
+JE-2024-0142,2024-12-04,2024-11-30,2024-11,2024-12-04 11:07:00,jdoe,mgr_chen,System,Vendor invoice posting,1,6310,Office Supplies Expense,12345.67,0.0
+JE-2024-0142,2024-12-04,2024-11-30,2024-11,2024-12-04 11:07:00,jdoe,mgr_chen,System,Vendor invoice posting,2,2010,Trade Payables,0.0,12345.67
+JE-2024-0143,2024-11-29,2024-11-29,2024-11,2024-11-29 09:22:00,asmith,mgr_olsen,System,Vendor invoice posting,1,6310,Office Supplies Expense,12345.67,0.0
+JE-2024-0143,2024-11-29,2024-11-29,2024-11,2024-11-29 09:22:00,asmith,mgr_olsen,System,Vendor invoice posting,2,2010,Trade Payables,0.0,12345.67
+JE-2024-0144,2024-11-14,2024-11-14,2024-11,2024-11-14 23:40:00,bwong,mgr_chen,System,Vendor invoice posting,1,6310,Office Supplies Expense,12345.67,0.0
+JE-2024-0144,2024-11-14,2024-11-14,2024-11,2024-11-14 23:40:00,bwong,mgr_chen,System,Vendor invoice posting,2,2010,Trade Payables,0.0,12345.67
+JE-2024-0145,2024-11-08,2024-11-08,2024-11,2024-11-08 13:03:00,asmith,mgr_olsen,System,Vendor invoice posting,1,6310,Office Supplies Expense,25000.0,0.0
+JE-2024-0145,2024-11-08,2024-11-08,2024-11,2024-11-08 13:03:00,asmith,mgr_olsen,System,Vendor invoice posting,2,2010,Trade Payables,0.0,25000.0
+JE-2024-0146,2024-11-20,2024-11-20,2024-11,2024-11-20 17:07:00,jdoe,mgr_diaz,System,Vendor invoice posting,1,6310,Office Supplies Expense,49200.0,0.0
+JE-2024-0146,2024-11-20,2024-11-20,2024-11,2024-11-20 17:07:00,jdoe,mgr_diaz,System,Vendor invoice posting,2,2010,Trade Payables,0.0,49200.0
+JE-2024-0147,2024-11-21,2024-11-21,2024-11,2024-11-21 14:32:00,lmartin,mgr_chen,System,Vendor invoice posting,1,6310,Office Supplies Expense,812450.55,0.0
+JE-2024-0147,2024-11-21,2024-11-21,2024-11,2024-11-21 14:32:00,lmartin,mgr_chen,System,Vendor invoice posting,2,2010,Trade Payables,0.0,812450.55
+JE-2024-0148,2024-11-21,2024-11-21,2024-11,2024-11-21 17:14:00,lmartin,mgr_chen,System,Vendor invoice posting,1,9999,Other Clearing 9999,12345.67,0.0
+JE-2024-0148,2024-11-21,2024-11-21,2024-11,2024-11-21 17:14:00,lmartin,mgr_chen,System,Vendor invoice posting,2,2010,Trade Payables,0.0,12345.67
+JE-2024-0149,2024-11-25,2024-11-25,2024-11,2024-11-25 13:29:00,jdoe,mgr_chen,System,Vendor invoice posting,1,2900,Suspense Account,12345.67,0.0
+JE-2024-0149,2024-11-25,2024-11-25,2024-11,2024-11-25 13:29:00,jdoe,mgr_chen,System,Vendor invoice posting,2,2010,Trade Payables,0.0,12345.67
+JE-2024-0150,2024-11-22,2024-11-22,2024-11,2024-11-22 15:27:00,jdoe,mgr_diaz,Manual,Vendor invoice posting,1,6310,Office Supplies Expense,12345.67,0.0
+JE-2024-0150,2024-11-22,2024-11-22,2024-11,2024-11-22 15:27:00,jdoe,mgr_diaz,Manual,Vendor invoice posting,2,2010,Trade Payables,0.0,12345.67
+JE-2024-0151,2024-11-21,2024-11-21,2024-11,2024-11-21 10:57:00,jdoe,jdoe,System,Vendor invoice posting,1,6310,Office Supplies Expense,12345.67,0.0
+JE-2024-0151,2024-11-21,2024-11-21,2024-11,2024-11-21 10:57:00,jdoe,jdoe,System,Vendor invoice posting,2,2010,Trade Payables,0.0,12345.67
+JE-2024-0152,2024-11-05,2024-11-05,2024-11,2024-11-05 14:38:00,asmith,mgr_chen,System,,1,6310,Office Supplies Expense,12345.67,0.0
+JE-2024-0152,2024-11-05,2024-11-05,2024-11,2024-11-05 14:38:00,asmith,mgr_chen,System,,2,2010,Trade Payables,0.0,12345.67
+JE-2024-0153,2024-11-07,2024-11-07,2024-11,2024-11-07 13:39:00,lmartin,mgr_olsen,System,Manual reclass to balance the GL plug,1,6310,Office Supplies Expense,12345.67,0.0
+JE-2024-0153,2024-11-07,2024-11-07,2024-11,2024-11-07 13:39:00,lmartin,mgr_olsen,System,Manual reclass to balance the GL plug,2,2010,Trade Payables,0.0,12345.67
+JE-2024-0154,2024-11-15,2024-11-15,2024-11,2024-11-15 15:38:00,lmartin,mgr_diaz,System,Vendor invoice posting,1,6310,Office Supplies Expense,15000.0,0.0
+JE-2024-0154,2024-11-15,2024-11-15,2024-11,2024-11-15 15:38:00,lmartin,mgr_diaz,System,Vendor invoice posting,2,2010,Trade Payables,0.0,9000.0
+JE-2024-0155,2024-11-30,2024-11-30,2024-11,2024-11-30 16:32:00,bwong,bwong,Manual,"Per CFO - true up reserve, reverse later",1,2900,Suspense Account,48750.0,0.0
+JE-2024-0155,2024-11-30,2024-11-30,2024-11,2024-11-30 16:32:00,bwong,bwong,Manual,"Per CFO - true up reserve, reverse later",2,2010,Trade Payables,0.0,48750.0

@@ -1,0 +1,18 @@
+{
+  "_comment": "Map canonical field (left) -> the column name in YOUR export (right). Delete fields your export doesn't have; rules that need a missing field are skipped automatically. Example below is a NetSuite-style export.",
+  "mapping": {
+    "je_id": "Document Number",
+    "line_no": "Line",
+    "entry_date": "Date Posted",
+    "effective_date": "Accounting Date",
+    "posted_at": "Created Timestamp",
+    "account": "Acct No",
+    "account_name": "Account",
+    "description": "Memo",
+    "debit": "Debit Amt",
+    "credit": "Credit Amt",
+    "entered_by": "Created By",
+    "approved_by": "Approved By",
+    "source": "Entry Type"
+  }
+}

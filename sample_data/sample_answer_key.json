@@ -1,0 +1,51 @@
+{
+  "JE-2024-0141": [
+    "WEEKEND_POSTING"
+  ],
+  "JE-2024-0142": [
+    "AFTER_PERIOD_END"
+  ],
+  "JE-2024-0143": [
+    "PERIOD_END_CONCENTRATION"
+  ],
+  "JE-2024-0144": [
+    "OFFHOURS_POSTING"
+  ],
+  "JE-2024-0145": [
+    "ROUND_AMOUNT"
+  ],
+  "JE-2024-0146": [
+    "BELOW_THRESHOLD"
+  ],
+  "JE-2024-0147": [
+    "LARGE_OUTLIER"
+  ],
+  "JE-2024-0148": [
+    "SELDOM_ACCOUNT"
+  ],
+  "JE-2024-0149": [
+    "SENSITIVE_ACCOUNT"
+  ],
+  "JE-2024-0150": [
+    "MANUAL_SOURCE"
+  ],
+  "JE-2024-0151": [
+    "SOD_CONFLICT"
+  ],
+  "JE-2024-0152": [
+    "BLANK_DESCRIPTION"
+  ],
+  "JE-2024-0153": [
+    "SUSPICIOUS_KEYWORD"
+  ],
+  "JE-2024-0154": [
+    "UNBALANCED_ENTRY"
+  ],
+  "JE-2024-0155": [
+    "WEEKEND_POSTING",
+    "MANUAL_SOURCE",
+    "SOD_CONFLICT",
+    "SENSITIVE_ACCOUNT",
+    "SUSPICIOUS_KEYWORD"
+  ]
+}

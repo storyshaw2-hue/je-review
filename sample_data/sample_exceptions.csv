@@ -1,0 +1,16 @@
+je_id,risk_score,tests_fired,test_ids,reasons,entry_date,period,lines,total_debit,total_credit,net_amount,entered_by,approved_by,source,description
+JE-2024-0155,12,7,"WEEKEND_POSTING, PERIOD_END_CONCENTRATION, BELOW_THRESHOLD, SENSITIVE_ACCOUNT, MANUAL_SOURCE, SOD_CONFLICT, SUSPICIOUS_KEYWORD","[WEEKEND_POSTING] Posted on Saturday 2024-11-30 ; [PERIOD_END_CONCENTRATION] Posted 2024-11-30 (last 3 days of month) ; [BELOW_THRESHOLD] $48,750 is within 5% under the $50,000 approval limit ; [SENSITIVE_ACCOUNT] Sensitive account: Suspense Account ; [MANUAL_SOURCE] Manual entry ; [SOD_CONFLICT] Preparer = approver (bwong) ; [SUSPICIOUS_KEYWORD] Description contains 'per cfo'",2024-11-30,2024-11,2,48750.0,48750.0,0.0,bwong,bwong,Manual,"Per CFO - true up reserve, reverse later"
+JE-2024-0154,4,2,"ROUND_AMOUNT, UNBALANCED_ENTRY","[ROUND_AMOUNT] Round amount $15,000 ; [UNBALANCED_ENTRY] Out of balance by $6,000.00",2024-11-15,2024-11,2,15000.0,9000.0,6000.0,lmartin,mgr_diaz,System,Vendor invoice posting
+JE-2024-0146,3,2,"BELOW_THRESHOLD, LARGE_OUTLIER","[BELOW_THRESHOLD] $49,200 is within 5% under the $50,000 approval limit ; [LARGE_OUTLIER] Large amount $49,200 (top 1%)",2024-11-20,2024-11,2,49200.0,49200.0,0.0,jdoe,mgr_diaz,System,Vendor invoice posting
+JE-2024-0148,3,2,"SELDOM_ACCOUNT, SENSITIVE_ACCOUNT",[SELDOM_ACCOUNT] Seldom-used account(s): 9999 ; [SENSITIVE_ACCOUNT] Sensitive account: Other Clearing 9999,2024-11-21,2024-11,2,12345.67,12345.67,0.0,lmartin,mgr_chen,System,Vendor invoice posting
+JE-2024-0142,3,1,AFTER_PERIOD_END,[AFTER_PERIOD_END] Period 2024-11 but posted 2024-12-04,2024-12-04,2024-11,2,12345.67,12345.67,0.0,jdoe,mgr_chen,System,Vendor invoice posting
+JE-2024-0151,3,1,SOD_CONFLICT,[SOD_CONFLICT] Preparer = approver (jdoe),2024-11-21,2024-11,2,12345.67,12345.67,0.0,jdoe,jdoe,System,Vendor invoice posting
+JE-2024-0141,2,1,WEEKEND_POSTING,[WEEKEND_POSTING] Posted on Saturday 2024-11-23,2024-11-23,2024-11,2,12345.67,12345.67,0.0,lmartin,mgr_diaz,System,Vendor invoice posting
+JE-2024-0152,2,1,BLANK_DESCRIPTION,[BLANK_DESCRIPTION] No description provided,2024-11-05,2024-11,2,12345.67,12345.67,0.0,asmith,mgr_chen,System,
+JE-2024-0153,2,1,SUSPICIOUS_KEYWORD,[SUSPICIOUS_KEYWORD] Description contains 'reclass',2024-11-07,2024-11,2,12345.67,12345.67,0.0,lmartin,mgr_olsen,System,Manual reclass to balance the GL plug
+JE-2024-0143,1,1,PERIOD_END_CONCENTRATION,[PERIOD_END_CONCENTRATION] Posted 2024-11-29 (last 3 days of month),2024-11-29,2024-11,2,12345.67,12345.67,0.0,asmith,mgr_olsen,System,Vendor invoice posting
+JE-2024-0144,1,1,OFFHOURS_POSTING,[OFFHOURS_POSTING] Posted at 23:40,2024-11-14,2024-11,2,12345.67,12345.67,0.0,bwong,mgr_chen,System,Vendor invoice posting
+JE-2024-0145,1,1,ROUND_AMOUNT,"[ROUND_AMOUNT] Round amount $25,000",2024-11-08,2024-11,2,25000.0,25000.0,0.0,asmith,mgr_olsen,System,Vendor invoice posting
+JE-2024-0147,1,1,LARGE_OUTLIER,"[LARGE_OUTLIER] Large amount $812,451 (top 1%)",2024-11-21,2024-11,2,812450.55,812450.55,0.0,lmartin,mgr_chen,System,Vendor invoice posting
+JE-2024-0149,1,1,SENSITIVE_ACCOUNT,[SENSITIVE_ACCOUNT] Sensitive account: Suspense Account,2024-11-25,2024-11,2,12345.67,12345.67,0.0,jdoe,mgr_chen,System,Vendor invoice posting
+JE-2024-0150,1,1,MANUAL_SOURCE,[MANUAL_SOURCE] Manual entry,2024-11-22,2024-11,2,12345.67,12345.67,0.0,jdoe,mgr_diaz,Manual,Vendor invoice posting
