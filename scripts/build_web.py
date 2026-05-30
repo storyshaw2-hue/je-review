@@ -55,10 +55,29 @@ HTML = """<!doctype html>
     border: 3px solid #D6DEEE; border-top-color: #1F3864;
     border-radius: 50%; animation: spin 0.9s linear infinite;
   }}
-  #boot-loader .progress {{
-    margin-top: 1rem; font-size: .8rem; color: #777; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  #boot-loader .progress-wrap {{
+    margin: 1.25rem auto 0; width: 320px; max-width: 80%;
+  }}
+  #boot-loader .progress-bar {{
+    width: 100%; height: 6px; background: #D6DEEE; border-radius: 3px; overflow: hidden;
+  }}
+  #boot-loader .progress-fill {{
+    height: 100%; width: 0%; background: linear-gradient(90deg, #1F3864 0%, #2E5BA6 100%);
+    border-radius: 3px; transition: width .4s ease;
+  }}
+  #boot-loader .progress-label {{
+    margin-top: .5rem; font-size: .8rem; color: #777;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    display: flex; justify-content: space-between;
   }}
   @keyframes spin {{ to {{ transform: rotate(360deg); }} }}
+  /* Mobile: tighten paddings, smaller fonts, stack footer */
+  @media (max-width: 640px) {{
+    .block-container {{ padding-left: 0.75rem !important; padding-right: 0.75rem !important; }}
+    .je-footer {{ flex-direction: column !important; gap: 2px; padding: 6px 10px !important; font-size: 11px !important; }}
+    #boot-loader h1 {{ font-size: 1.2rem; }}
+    #boot-loader .progress-wrap {{ width: 90%; }}
+  }}
   #loading {{ font-family: Arial, Helvetica, sans-serif; max-width: 640px;
               margin: 12vh auto; padding: 0 1.5rem; color: #1F3864; line-height: 1.5; }}
   #loading h1 {{ font-size: 1.4rem; }}
@@ -75,7 +94,13 @@ HTML = """<!doctype html>
        (~15–60 seconds). It is cached after that, so future loads are instant.</p>
     <p class="muted">Everything runs in your browser. Your ledger is never uploaded —
        it does not leave this computer.</p>
-    <div class="progress" id="boot-status">Starting…</div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="boot-fill"></div></div>
+      <div class="progress-label">
+        <span id="boot-status">Starting…</span>
+        <span id="boot-pct">0%</span>
+      </div>
+    </div>
   </div>
 </div>
 <div id="root">
@@ -91,23 +116,39 @@ HTML = """<!doctype html>
   // Hide the boot loader once the Streamlit app actually renders.
   (function () {{
     var status = document.getElementById('boot-status');
+    var fill = document.getElementById('boot-fill');
+    var pct = document.getElementById('boot-pct');
     var steps = ['Starting…', 'Downloading Python runtime…', 'Installing packages…', 'Almost there…'];
     var i = 0;
     var statusTimer = setInterval(function () {{
       i = Math.min(i + 1, steps.length - 1);
       if (status) status.textContent = steps[i];
     }}, 4000);
+    // Animated progress: smooth climb to 90% over ~25s, then idles at 90% until mount detected.
+    // Curves toward 90 asymptotically so it never "finishes" before stlite actually mounts.
+    var startTime = Date.now();
+    var progressTimer = setInterval(function () {{
+      var elapsed = (Date.now() - startTime) / 1000;
+      var target = Math.min(90, 90 * (1 - Math.exp(-elapsed / 12)));
+      if (fill) fill.style.width = target.toFixed(1) + '%';
+      if (pct) pct.textContent = Math.round(target) + '%';
+    }}, 200);
     var obs = new MutationObserver(function () {{
       var mounted = document.querySelector('[data-testid="stAppViewContainer"]') ||
                     document.querySelector('.stApp') ||
                     document.querySelector('iframe[title="streamlit"]');
       if (mounted) {{
+        // Snap to 100% briefly so users see completion before fade.
+        if (fill) fill.style.width = '100%';
+        if (pct) pct.textContent = '100%';
+        if (status) status.textContent = 'Ready';
         var bl = document.getElementById('boot-loader');
         if (bl) {{
-          bl.style.opacity = '0';
-          setTimeout(function () {{ bl.remove(); }}, 450);
+          setTimeout(function () {{ bl.style.opacity = '0'; }}, 200);
+          setTimeout(function () {{ bl.remove(); }}, 650);
         }}
         clearInterval(statusTimer);
+        clearInterval(progressTimer);
         obs.disconnect();
       }}
     }});
@@ -117,6 +158,7 @@ HTML = """<!doctype html>
       var bl = document.getElementById('boot-loader');
       if (bl) {{ bl.style.opacity = '0'; setTimeout(function(){{ bl.remove(); }}, 450); }}
       clearInterval(statusTimer);
+      clearInterval(progressTimer);
       obs.disconnect();
     }}, 90000);
   }})();

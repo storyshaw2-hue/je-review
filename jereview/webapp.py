@@ -94,6 +94,21 @@ def render(allow_ai: bool = True) -> None:
 
     with st.sidebar:
         st.header("Review Settings")
+
+        # Rules reference: lets reviewers see exactly what the tool checks
+        with st.expander("📖 What does this tool check?"):
+            try:
+                from .rules import RULES as _RULES
+                rules_rows = [
+                    {"Check": r.label, "Weight": r.weight, "What it finds": r.description}
+                    for r in sorted(_RULES, key=lambda r: -r.weight)
+                ]
+                st.caption(f"{len(rules_rows)} automated checks. Weight 3 = high risk, 2 = medium, 1 = low.")
+                st.dataframe(pd.DataFrame(rules_rows), hide_index=True, height=300)
+            except Exception as _e:  # noqa: BLE001
+                st.caption(f"Rules reference unavailable: {_e}")
+
+        st.divider()
         threshold = st.number_input("Approval threshold ($)", min_value=0, value=50000, step=1000,
                                     help="Used by the 'just below threshold' check.")
         st.divider()
@@ -321,10 +336,38 @@ def render(allow_ai: bool = True) -> None:
 
     # ---- review queue ----
     st.subheader("Review queue — confirm each entry was recorded correctly")
+
+    # Top-line summary metrics (gives the reviewer an at-a-glance sense before diving in)
+    if not ent_all.empty:
+        total_surfaced = len(ent_all)
+        likely_errors = int(ent_all["flag_type"].isin(["Accuracy", "Both"]).sum())
+        anomalies = int(ent_all["flag_type"].isin(["Risk", "Both"]).sum())
+        avg_priority = float(ent_all["risk_score"].mean()) if "risk_score" in ent_all.columns else 0.0
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("Surfaced", total_surfaced, help="Total entries flagged for review")
+        m2.metric("Likely errors", likely_errors, help="Accuracy issues: amount/date/account problems")
+        m3.metric("Anomalies", anomalies, help="Risk signals: weekend/manual/round-number/etc.")
+        m4.metric("Avg priority", f"{avg_priority:.1f}", help="Mean risk score across surfaced entries")
+
     if ent_all.empty:
         st.success("Nothing surfaced. No entries need review.")
         reviews: dict = {}
     else:
+        with st.expander("ℹ️ How to read this queue", expanded=False):
+            st.markdown(
+                """
+                - **Priority** = risk score (higher = more anomalous). Sort by Priority to triage worst first.
+                - **Flag type** = `Accuracy` (likely error), `Risk` (anomaly only), or `Both`.
+                - **Why surfaced** = which checks fired, in plain English.
+                - **Suggested** = match against a previously-concluded recurring entry (if you uploaded review memory).
+                - **Disposition** = your call: `Open` / `Needs support` / `Recorded correctly` / `Needs correction` / `Out of scope`.
+                - **Assertions** = does support agree on Amount / Date / Account / Description?
+                - **Correction** = the JE you'd propose if `Needs correction`.
+                - **Conclusion** = your write-up for the workpaper.
+
+                Everything you type here stays in your browser. Use the download buttons below to save your workpaper.
+                """
+            )
         st.caption("The checks below only *surface* entries. You decide if each was recorded correctly. "
                    "Set a disposition, record whether support agrees on amount / date / account / "
                    "description, and attach support in the table underneath. Nothing leaves your browser.")
