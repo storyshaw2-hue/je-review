@@ -1,0 +1,26 @@
+je_id,line_no,entry_date,effective_date,period,account,account_name,description,debit,credit,entered_by,approved_by,source
+ERR-0001,1,2024-11-04,2024-11-04,2024-11,6000,Office Expense,Two debits no credit,1000.00,0.00,ksmith,mgr_ortiz,System
+ERR-0001,2,2024-11-04,2024-11-04,2024-11,6000,Office Expense,Two debits no credit,500.00,0.00,ksmith,mgr_ortiz,System
+ERR-0002,1,2024-11-05,2024-11-05,2024-11,6000,Office Expense,Both DR and CR on a line,800.00,800.00,rlee,mgr_ortiz,System
+ERR-0002,2,2024-11-05,2024-11-05,2024-11,2000,Trade Payables,Both DR and CR on a line,0.00,800.00,rlee,mgr_ortiz,System
+ERR-0003,1,2024-11-06,2024-11-06,2024-11,6000,Office Expense,Has a blank line,1200.00,0.00,ksmith,mgr_ortiz,System
+ERR-0003,2,2024-11-06,2024-11-06,2024-11,2000,Trade Payables,Has a blank line,0.00,1200.00,ksmith,mgr_ortiz,System
+ERR-0003,3,2024-11-06,2024-11-06,2024-11,6000,Office Expense,Has a blank line,0.00,0.00,ksmith,mgr_ortiz,System
+ERR-0004,1,2024-11-07,2024-11-07,2024-11,6000,Office Expense,Negative posted,-500.00,0.00,rlee,mgr_ortiz,System
+ERR-0004,2,2024-11-07,2024-11-07,2024-11,2000,Trade Payables,Negative posted,0.00,-500.00,rlee,mgr_ortiz,System
+ERR-0005,1,2024-11-08,2024-11-08,2024-11,,,Missing account number,700.00,0.00,ksmith,mgr_ortiz,System
+ERR-0005,2,2024-11-08,2024-11-08,2024-11,2000,Trade Payables,Missing account number,0.00,700.00,ksmith,mgr_ortiz,System
+ERR-0006,1,2024-11-11,2024-11-11,2024-11,7000,Bank,Account named Bank,900.00,0.00,rlee,mgr_ortiz,System
+ERR-0006,2,2024-11-11,2024-11-11,2024-11,2000,Trade Payables,Account named Bank,0.00,900.00,rlee,mgr_ortiz,System
+ERR-0007,1,2024-11-12,2024-11-12,2024-11,7000,Cash,Same account named Cash,950.00,0.00,ksmith,mgr_ortiz,System
+ERR-0007,2,2024-11-12,2024-11-12,2024-11,2000,Trade Payables,Same account named Cash,0.00,950.00,ksmith,mgr_ortiz,System
+ERR-0008,1,2024-11-13,2024-10-15,2024-11,6000,Office Expense,Wrong period,300.00,0.00,rlee,mgr_ortiz,System
+ERR-0008,2,2024-11-13,2024-10-15,2024-11,2000,Trade Payables,Wrong period,0.00,300.00,rlee,mgr_ortiz,System
+ERR-0009,1,2024-11-14,2024-11-14,2024-11,6000,Office Expense,Sub-cent amount,100.12345,0.00,ksmith,mgr_ortiz,System
+ERR-0009,2,2024-11-14,2024-11-14,2024-11,2000,Trade Payables,Sub-cent amount,0.00,100.12345,ksmith,mgr_ortiz,System
+ERR-0010,1,2027-03-01,2027-03-01,2027-03,6000,Office Expense,Future dated,400.00,0.00,rlee,mgr_ortiz,System
+ERR-0010,2,2027-03-01,2027-03-01,2027-03,2000,Trade Payables,Future dated,0.00,400.00,rlee,mgr_ortiz,System
+ERR-0011,1,2024-11-15,2024-11-15,2024-11,6000,Office Expense,Clean entry,642.50,0.00,ksmith,mgr_ortiz,System
+ERR-0011,2,2024-11-15,2024-11-15,2024-11,2000,Trade Payables,Clean entry,0.00,642.50,ksmith,mgr_ortiz,System
+ERR-0012,1,2024-11-18,2024-11-18,2024-11,6000,Office Expense,Clean entry,318.75,0.00,rlee,mgr_ortiz,System
+ERR-0012,2,2024-11-18,2024-11-18,2024-11,2000,Trade Payables,Clean entry,0.00,318.75,rlee,mgr_ortiz,System

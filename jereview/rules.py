@@ -34,14 +34,15 @@ class Rule:
     requires: list      # canonical fields needed; rule skipped if any missing
     description: str
     func: object
+    category: str = "Risk"          # "Risk" (judgement) or "Accuracy" (correctness)
 
     def runnable(self, available: set) -> bool:
         return all(f in available for f in self.requires)
 
 
-def rule(id, label, scope, weight, requires, description):
+def rule(id, label, scope, weight, requires, description, category="Risk"):
     def deco(fn):
-        RULES.append(Rule(id, label, scope, weight, list(requires), description, fn))
+        RULES.append(Rule(id, label, scope, weight, list(requires), description, fn, category))
         return fn
     return deco
 
@@ -61,6 +62,7 @@ class RuleContext:
     materiality_floor: float = 0.0          # ignore amounts below this for outliers
     reversal_window_days: int = 5           # quick-reversal look-around window (days)
     rare_user_max_entries: int = 2          # user posting <= N entries counts as "rare"
+    known_accounts: set | None = None       # chart-of-accounts whitelist (optional)
     sensitive_account_keywords: list = field(default_factory=lambda: [
         "suspense", "clearing", "reserve", "accrual", "equity", "revenue",
         "intercompany", "ic ", "related party", "goodwill", "impairment",
@@ -269,7 +271,8 @@ def r_keyword(df, ctx):
 # ---------------------------------------------------------------------------
 
 @rule("UNBALANCED_ENTRY", "Entry does not balance", "entry", 3, ["amount"],
-      "Signed line amounts for the entry do not net to zero — debits ≠ credits.")
+      "Signed line amounts for the entry do not net to zero — debits ≠ credits.",
+      category="Accuracy")
 def r_unbalanced(df, ctx):
     net = df.groupby("je_id")["amount"].sum().round(2)
     flagged = net[net.abs() > 0.005]
@@ -390,4 +393,141 @@ def r_rare_user(df, ctx):
     for je, u in rare_entries.items():
         c = int(counts[u])
         out[je] = f"Posted by infrequent user '{u}' ({c} entr{'y' if c == 1 else 'ies'} in file)"
+    return out
+
+
+# ---------------------------------------------------------------------------
+# ACCURACY / CORRECTNESS rules  (category="Accuracy")
+# "Was this entry recorded correctly?" — closer to objective data errors than
+# judgement calls; aimed at preparers / controllers, not just auditors.
+# ---------------------------------------------------------------------------
+
+@rule("SINGLE_SIDED_ENTRY", "All lines on one side", "entry", 3, ["debit", "credit"],
+      "Entry has only debit lines or only credit lines — no offsetting side.",
+      category="Accuracy")
+def r_single_sided(df, ctx):
+    g = df.groupby("je_id").agg(D=("debit", "sum"), C=("credit", "sum"))
+    out = {}
+    for je, row in g.iterrows():
+        D, C = abs(float(row["D"])), abs(float(row["C"]))
+        if (D < 0.005) ^ (C < 0.005):
+            side = "debits" if C < 0.005 else "credits"
+            out[je] = f"All lines are {side}; no offsetting side"
+    return out
+
+
+@rule("DEBIT_AND_CREDIT_SAME_LINE", "Debit and credit on one line", "line", 3,
+      ["debit", "credit"],
+      "A single line carries both a debit and a credit amount — usually a keying error.",
+      category="Accuracy")
+def r_dr_cr_same_line(df, ctx):
+    mask = (df["debit"].abs() > 0.005) & (df["credit"].abs() > 0.005)
+    return {je: "A line has both a debit and a credit amount"
+            for je, _ in df[mask].groupby("je_id")}
+
+
+@rule("BLANK_LINE_AMOUNT", "Line with no amount", "line", 2, ["debit", "credit"],
+      "A line has neither a debit nor a credit — an incomplete or placeholder line.",
+      category="Accuracy")
+def r_blank_amount(df, ctx):
+    mask = (df["debit"].abs() < 0.005) & (df["credit"].abs() < 0.005)
+    out = {}
+    for je, sub in df[mask].groupby("je_id"):
+        out[je] = f"{len(sub)} line(s) with no debit or credit amount"
+    return out
+
+
+@rule("NEGATIVE_DR_CR", "Negative debit/credit", "line", 2, ["debit", "credit"],
+      "A debit or credit column holds a negative number — the sign should come from "
+      "the column, not a minus.",
+      category="Accuracy")
+def r_negative(df, ctx):
+    mask = (df["debit"] < -0.005) | (df["credit"] < -0.005)
+    return {je: "Negative value in a debit/credit column"
+            for je, _ in df[mask].groupby("je_id")}
+
+
+@rule("MISSING_ACCOUNT", "Line missing an account", "line", 3, ["account"],
+      "A line has no GL account number — the posting target is undefined.",
+      category="Accuracy")
+def r_missing_account(df, ctx):
+    acct = df["account"].astype("string").str.strip()
+    mask = acct.isna() | (acct == "")
+    out = {}
+    for je, sub in df[mask].groupby("je_id"):
+        out[je] = f"{len(sub)} line(s) with no account number"
+    return out
+
+
+@rule("ACCOUNT_NAME_INCONSISTENT", "Account number / name mismatch", "line", 1,
+      ["account", "account_name"],
+      "The same account number is recorded under more than one name across the file.",
+      category="Accuracy")
+def r_name_inconsistent(df, ctx):
+    nm = df.assign(_n=df["account_name"].astype("string").str.strip())
+    nm = nm[nm["_n"].notna() & (nm["_n"] != "")]
+    per = nm.groupby("account")["_n"].agg(lambda s: set(s))
+    bad = {a: names for a, names in per.items() if len(names) > 1}
+    out = {}
+    for je, sub in df[df["account"].isin(bad)].groupby("je_id"):
+        a = next(x for x in sub["account"] if x in bad)
+        out[je] = f"Account {a} recorded under multiple names: " + ", ".join(sorted(bad[a])[:3])
+    return out
+
+
+@rule("PERIOD_DATE_MISMATCH", "Date outside its period", "entry", 2,
+      ["entry_date", "period"],
+      "The entry's effective date falls outside the accounting period it is labelled with.",
+      category="Accuracy")
+def r_period_mismatch(df, ctx):
+    g = df.groupby("je_id").agg(eff=("effective_date", "first"),
+                                ent=("entry_date", "first"), per=("period", "first"))
+    out = {}
+    for je, row in g.iterrows():
+        base = row["eff"] if pd.notna(row["eff"]) else row["ent"]
+        per = row["per"]
+        if pd.isna(base) or not isinstance(per, str) or len(per) < 7:
+            continue
+        if base.strftime("%Y-%m") != per[:7]:
+            out[je] = f"Dated {base:%Y-%m-%d} but labelled period {per}"
+    return out
+
+
+@rule("EXCESS_PRECISION", "More than 2 decimal places", "line", 1, ["amount"],
+      "A line amount has sub-cent precision (e.g. 12.3456) — usually a rounding or import error.",
+      category="Accuracy")
+def r_excess_precision(df, ctx):
+    amt = df["amount"].fillna(0.0)
+    mask = (amt.round(2) - amt).abs() > 1e-6
+    out = {}
+    for je, sub in df[mask].groupby("je_id"):
+        out[je] = f"Amount with sub-cent precision (e.g. {sub['amount'].iloc[0]})"
+    return out
+
+
+@rule("FUTURE_DATE", "Future-dated entry", "entry", 2, ["entry_date"],
+      "The entry is dated after today — likely a date-entry error.",
+      category="Accuracy")
+def r_future_date(df, ctx):
+    today = pd.Timestamp.now().normalize()
+    ed = _entry_dates(df).dropna()
+    flagged = ed[ed.dt.normalize() > today]
+    return {je: f"Dated in the future ({d:%Y-%m-%d})" for je, d in flagged.items()}
+
+
+@rule("UNKNOWN_ACCOUNT", "Account not in chart of accounts", "line", 2, ["account"],
+      "A line posts to an account not present in the uploaded chart of accounts. "
+      "Runs only when a chart of accounts is provided.",
+      category="Accuracy")
+def r_unknown_account(df, ctx):
+    known = getattr(ctx, "known_accounts", None)
+    if not known:
+        return {}
+    known = {str(k).strip() for k in known}
+    acct = df["account"].astype("string").str.strip()
+    mask = acct.notna() & (acct != "") & (~acct.isin(known))
+    out = {}
+    for je, sub in df[mask].groupby("je_id"):
+        miss = ", ".join(sorted(set(sub["account"].dropna()))[:3])
+        out[je] = f"Account(s) not in chart of accounts: {miss}"
     return out

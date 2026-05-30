@@ -20,7 +20,7 @@ PKG = ROOT / "jereview"
 OUT = ROOT  # index.html at repo root → GitHub Pages "deploy from branch / root" just works
 
 # Runtime modules needed in the browser (CLI / __main__ are not).
-MODULES = ["__init__", "schema", "rules", "engine", "report", "triage",
+MODULES = ["__init__", "schema", "rules", "review", "engine", "report", "triage",
            "pipeline", "webapp"]
 
 STLITE_VERSION = "0.77.0"

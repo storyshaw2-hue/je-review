@@ -1,12 +1,5 @@
-"""
-Headless UI smoke test — drives the Streamlit app end-to-end via the official
-AppTest harness (no browser). Uploads the sample export, clicks Run, and asserts
-the metrics, flagged results, disposition editor, and download buttons render
-with no exception. Run:  python -m pytest -q tests/test_ui_smoke.py
-"""
-
+"""Headless UI smoke test via Streamlit's AppTest (no browser)."""
 from pathlib import Path
-
 ROOT = Path(__file__).resolve().parent.parent
 SAMPLE = ROOT / "sample_data" / "sample_je.csv"
 
@@ -16,9 +9,11 @@ def _drive():
     at = AppTest.from_file(str(ROOT / "ui" / "streamlit_app.py"), default_timeout=90)
     at.run()
     at.number_input[0].set_value(50000)
-    at.file_uploader[0].set_value(("sample_je.csv", SAMPLE.read_bytes(), "text/csv"))
+    # pick the main JE uploader by label (sidebar adds mapping + CoA uploaders too)
+    up = [u for u in at.file_uploader if "journal-entry" in (u.label or "").lower()][0]
+    up.set_value(("sample_je.csv", SAMPLE.read_bytes(), "text/csv"))
     at.run()
-    at.button[0].set_value(True)   # Run review
+    at.button[0].set_value(True)
     at.run()
     return at
 
@@ -31,8 +26,8 @@ def test_ui_runs_without_exception():
 def test_ui_renders_expected_outputs():
     at = _drive()
     metrics = {m.label: m.value for m in at.metric}
-    assert metrics.get("Entries flagged") == "15"
-    res = at.session_state["jr_result"]          # run is stashed in session
+    assert metrics.get("Surfaced for review") == "15"
+    res = at.session_state["jr_result"]
     assert len(res.entries) == 15
     assert res.entries.iloc[0]["je_id"] == "JE-2024-0155"
     labels = [d.label for d in at.get("download_button")]

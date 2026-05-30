@@ -1,14 +1,22 @@
 """
-report.py — Write the exceptions workpaper.
+report.py — Write the JE review workpaper.
 
-Excel workbook with four sheets:
-  Summary     — run metadata, population shape, per-test counts, Benford diagnostic
-  Exceptions  — one row per flagged entry, ranked by risk score (auto-filter,
-                frozen header, risk band, disposition dropdown, hyperlinks to Triage)
-  Test Catalog— every rule, its weight, what it needs, whether it ran
-  Triage      — plain-English triage notes for the top exceptions (optional)
+This documents a *review*, not just a list of flags. The automated checks are a
+first-pass screen (Triage checks) that surface entries to look at; the reviewer
+records, per entry, whether support agrees on amount / date / account /
+description, a disposition, and a conclusion.
 
-Also writes a flat CSV of the Exceptions sheet for downstream analysis.
+Workbook sheets:
+  Review Summary — run metadata, population shape, triage-check results,
+                   review status (disposition breakdown + support coverage), Benford
+  Review Queue   — one row per surfaced entry: why it surfaced + the reviewer's
+                   support review (assertions, disposition, correction, conclusion)
+  Support Log    — one row per support item attached to an entry (metadata only)
+  Triage checks  — every check, its weight/category, whether it ran (+ scorecard)
+  Triage Notes   — plain-English notes for the top entries (optional)
+
+Also writes a flat CSV mirroring the Review Queue. No support-file binaries are
+stored — only metadata and conclusions.
 """
 
 from __future__ import annotations
@@ -19,11 +27,17 @@ from pathlib import Path
 import pandas as pd
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
-from openpyxl.formatting.rule import ColorScaleRule, CellIsRule, FormulaRule
+from openpyxl.formatting.rule import ColorScaleRule, CellIsRule
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
 
 from .engine import RunResult
+from .review import (
+    ReviewRecord, DISPOSITIONS, SUPPORT_STATUSES, ASSERTION_OUTCOMES, ASSERTIONS,
+    ACCEPTED_DISPOSITIONS, ISSUE_DISPOSITIONS, PENDING_DISPOSITIONS,
+)
+
+REVIEW_SHEET = "Review Queue"
 
 FONT = "Arial"
 HEAD_FILL = PatternFill("solid", fgColor="1F3864")
@@ -32,19 +46,23 @@ TITLE_FONT = Font(name=FONT, bold=True, size=14, color="1F3864")
 SUBHEAD_FONT = Font(name=FONT, bold=True, size=11, color="1F3864")
 NOTE_FONT = Font(name=FONT, italic=True, size=9, color="595959")
 BASE_FONT = Font(name=FONT, size=10)
-MUTED_FONT = Font(name=FONT, size=10, color="9A9A9A")  # for skipped rows / N/A
-BOLD_RED_FONT = Font(name=FONT, size=10, bold=True, color="C00000")
+MUTED_FONT = Font(name=FONT, size=10, color="9A9A9A")
 
-# Disposition palette
+# Disposition palette (keys must match review.DISPOSITIONS)
 DISP_FILLS = {
-    "Open":                 PatternFill("solid", fgColor="FFF4D6"),  # amber
-    "Cleared":              PatternFill("solid", fgColor="E2EFDA"),  # green
-    "Misstatement":         PatternFill("solid", fgColor="FCE4D6"),  # red-orange
-    "Control deficiency":   PatternFill("solid", fgColor="DDEBF7"),  # blue
-    "Referred to manager":  PatternFill("solid", fgColor="EDEDED"),  # grey
+    "Open":                         PatternFill("solid", fgColor="FFF4D6"),  # amber
+    "Recorded correctly":           PatternFill("solid", fgColor="E2EFDA"),  # green
+    "Expected business activity":   PatternFill("solid", fgColor="E2EFDA"),  # green
+    "Needs support / explanation":  PatternFill("solid", fgColor="FFF0CC"),  # light amber
+    "Needs correction":             PatternFill("solid", fgColor="FCE4D6"),  # red-orange
+    "False positive":              PatternFill("solid", fgColor="EDEDED"),  # grey
+    "Escalate":                     PatternFill("solid", fgColor="F4B5B5"),  # red
 }
-DISP_CHOICES = list(DISP_FILLS.keys())
-
+ASSERT_FILLS = {
+    "Agrees":        PatternFill("solid", fgColor="E2EFDA"),
+    "Discrepancy":   PatternFill("solid", fgColor="F4B5B5"),
+    "Not in support": PatternFill("solid", fgColor="FFF0CC"),
+}
 SKIPPED_ROW_FILL = PatternFill("solid", fgColor="F5F5F5")
 
 
@@ -56,7 +74,7 @@ def _style_header(ws, row, ncols):
         cell.alignment = Alignment(vertical="center", wrap_text=True, horizontal="left")
 
 
-def _risk_band(score) -> str:
+def _priority_band(score) -> str:
     try:
         s = float(score)
     except (TypeError, ValueError):
@@ -70,31 +88,62 @@ def _risk_band(score) -> str:
     return ""
 
 
+def _rec(reviews, je) -> ReviewRecord | None:
+    """Return a ReviewRecord for an entry, coercing dicts (incl. the legacy
+    {disposition, note} shape) so older callers keep working."""
+    if not reviews:
+        return None
+    v = reviews.get(str(je)) if str(je) in reviews else reviews.get(je)
+    if v is None:
+        return None
+    if isinstance(v, ReviewRecord):
+        return v
+    d = dict(v)
+    if "conclusion" not in d and "note" in d:
+        d["conclusion"] = d.get("note", "")
+    d.setdefault("je_id", str(je))
+    return ReviewRecord.from_dict(d)
+
+
+def _add_dropdown(ws, col_letter, max_row, choices, title):
+    if max_row < 2:
+        return
+    dv = DataValidation(type="list", formula1='"' + ",".join(choices) + '"',
+                        allow_blank=True, showDropDown=False, errorStyle="warning")
+    dv.error = "Pick one of: " + ", ".join(choices)
+    dv.errorTitle = title
+    dv.prompt = title
+    dv.promptTitle = title
+    dv.add(f"{col_letter}2:{col_letter}{max_row}")
+    ws.add_data_validation(dv)
+
+
 def write_excel(result: RunResult, out_path, source_name: str = "",
-                triage_md: str | None = None, dispositions: dict | None = None):
+                triage_md: str | None = None, reviews: dict | None = None,
+                scorecard: dict | None = None):
     target = out_path if hasattr(out_path, "write") else Path(out_path)
     wb = Workbook()
-
     df_entries = result.entries.copy() if not result.entries.empty else pd.DataFrame()
 
     # =========================================================
-    # Summary
+    # Review Summary
     # =========================================================
     ws = wb.active
-    ws.title = "Summary"
-    ws["A1"] = "Journal Entry Risk Review"
+    ws.title = "Review Summary"
+    ws["A1"] = "Journal Entry Review"
     ws["A1"].font = TITLE_FONT
-    ws.merge_cells("A1:E1")
+    ws.merge_cells("A1:F1")
 
-    # --- Run metadata ---
     meta = [
         ("Source file", source_name or "(in-memory)"),
         ("Run timestamp", datetime.now().strftime("%Y-%m-%d %H:%M")),
         ("Period(s)", result.stats.get("periods", "")),
-        ("Total entries tested", result.stats.get("total_entries", 0)),
-        ("Total lines tested", result.stats.get("total_lines", 0)),
-        ("Entries flagged", result.stats.get("flagged_entries", 0)),
-        ("Share of entries flagged", f"{result.stats.get('flagged_pct', 0)}%"),
+        ("Total entries", result.stats.get("total_entries", 0)),
+        ("Total lines", result.stats.get("total_lines", 0)),
+        ("Surfaced for review", result.stats.get("flagged_entries", 0)),
+        ("Share surfaced", f"{result.stats.get('flagged_pct', 0)}%"),
+        ("Likely recording errors", result.stats.get("accuracy_entries", 0)),
+        ("Anomalies to confirm", result.stats.get("risk_entries", 0)),
     ]
     r = 3
     for k, v in meta:
@@ -102,12 +151,38 @@ def write_excel(result: RunResult, out_path, source_name: str = "",
         ws.cell(row=r, column=2, value=v).font = BASE_FONT
         r += 1
 
-    # --- Population shape (NEW) ---
+    # --- Review status (NEW) ---
+    r += 1
+    ws.cell(row=r, column=1, value="Review status").font = SUBHEAD_FONT
+    r += 1
+    flagged_ids = list(df_entries["je_id"]) if not df_entries.empty else []
+    recs = [_rec(reviews, j) for j in flagged_ids]
+    recs = [x for x in recs if x is not None]
+    disp_counts = {d: 0 for d in DISPOSITIONS}
+    support_reviewed = 0
+    for rc in recs:
+        disp_counts[rc.disposition] = disp_counts.get(rc.disposition, 0) + 1
+        if rc.support_reviewed:
+            support_reviewed += 1
+    reviewed = sum(v for d, v in disp_counts.items() if d != "Open")
+    n_flagged = len(flagged_ids)
+    status_rows = [
+        ("Entries with a disposition", f"{reviewed} of {n_flagged}"),
+        ("Support reviewed / not required", f"{support_reviewed} of {n_flagged}"),
+    ]
+    for d in DISPOSITIONS:
+        if disp_counts.get(d):
+            status_rows.append((f"  {d}", disp_counts[d]))
+    for k, v in status_rows:
+        ws.cell(row=r, column=1, value=k).font = Font(name=FONT, bold=k.strip() in ("Entries with a disposition", "Support reviewed / not required"), size=10)
+        ws.cell(row=r, column=2, value=v).font = BASE_FONT
+        r += 1
+
+    # --- Population shape ---
     r += 1
     ws.cell(row=r, column=1, value="Population shape").font = SUBHEAD_FONT
     r += 1
-    pop_rows = _population_shape(df_entries, result)
-    for k, v in pop_rows:
+    for k, v in _population_shape(df_entries, result):
         ws.cell(row=r, column=1, value=k).font = Font(name=FONT, bold=True, size=10)
         cell = ws.cell(row=r, column=2, value=v)
         cell.font = BASE_FONT
@@ -115,85 +190,53 @@ def write_excel(result: RunResult, out_path, source_name: str = "",
             cell.number_format = "$#,##0;($#,##0);-"
         r += 1
 
-    # --- Test results table ---
+    # --- Triage-check results ---
     r += 1
-    ws.cell(row=r, column=1, value="Test results").font = SUBHEAD_FONT
+    ws.cell(row=r, column=1, value="First-pass checks (triage)").font = SUBHEAD_FONT
     r += 1
-    hdr = ["Test", "Weight", "Ran?", "Entries flagged", "% of flagged", "What it needs"]
+    hdr = ["Check", "Weight", "Ran?", "Entries surfaced", "% of surfaced", "What it needs"]
     for i, h in enumerate(hdr, start=1):
         ws.cell(row=r, column=i, value=h)
     _style_header(ws, r, len(hdr))
-    head_row = r
     r += 1
     rs = result.rule_summary
     flagged_total = int(result.stats.get("flagged_entries", 0)) or 0
-
-    test_start_row = r
     for _, row in rs.iterrows():
         ran = bool(row["ran"])
         label_cell = ws.cell(row=r, column=1, value=row["label"])
         weight_cell = ws.cell(row=r, column=2, value=int(row["weight"]))
         ran_cell = ws.cell(row=r, column=3, value="Yes" if ran else "No — field missing")
         count_cell = ws.cell(row=r, column=4,
-                             value=f'=COUNTIF(Exceptions!E:E,"*"&"{row["rule_id"]}"&"*")')
-        pct_formula = (
-            f'=IFERROR(D{r}/{flagged_total},0)' if flagged_total > 0 else '=""'
-        )
-        pct_cell = ws.cell(row=r, column=5, value=pct_formula)
+                             value=f"=COUNTIF('{REVIEW_SHEET}'!F:F,\"*\"&\"{row['rule_id']}\"&\"*\")")
+        pct_cell = ws.cell(row=r, column=5,
+                           value=(f"=IFERROR(D{r}/{flagged_total},0)" if flagged_total > 0 else '=""'))
         pct_cell.number_format = "0.0%"
         needs_cell = ws.cell(row=r, column=6, value=row["requires"])
-
-        if ran:
-            label_cell.font = BASE_FONT
-            weight_cell.font = BASE_FONT
-            ran_cell.font = BASE_FONT
-            count_cell.font = BASE_FONT
-            pct_cell.font = BASE_FONT
-            needs_cell.font = BASE_FONT
-        else:
-            for c in (label_cell, weight_cell, ran_cell, count_cell, pct_cell, needs_cell):
-                c.font = MUTED_FONT
+        cells = (label_cell, weight_cell, ran_cell, count_cell, pct_cell, needs_cell)
+        for c in cells:
+            c.font = BASE_FONT if ran else MUTED_FONT
+            if not ran:
                 c.fill = SKIPPED_ROW_FILL
-        weight_cell.alignment = Alignment(horizontal="center")
-        ran_cell.alignment = Alignment(horizontal="center")
-        count_cell.alignment = Alignment(horizontal="center")
-        pct_cell.alignment = Alignment(horizontal="center")
+        for c in (weight_cell, ran_cell, count_cell, pct_cell):
+            c.alignment = Alignment(horizontal="center")
         r += 1
-    test_end_row = r - 1
 
-    # Conditional formatting: bold red where count > 0
-    if test_end_row >= test_start_row:
-        red_font_rule = FormulaRule(
-            formula=[f'$D{test_start_row}>0'],
-            font=Font(name=FONT, size=10, bold=True, color="C00000"),
-        )
-        # Apply to count column for the data rows
-        ws.conditional_formatting.add(
-            f"D{test_start_row}:D{test_end_row}",
-            CellIsRule(operator="greaterThan", formula=["0"],
-                       font=Font(name=FONT, size=10, bold=True, color="C00000")),
-        )
-
-    # --- Benford section ---
+    # --- Benford ---
     r += 1
     b = result.benford or {}
-    has_benford = b.get("mad") is not None
-    if has_benford:
+    if b.get("mad") is not None:
         ws.cell(row=r, column=1, value="Benford first-digit diagnostic (population)").font = SUBHEAD_FONT
         r += 1
-        ws.cell(row=r, column=1,
-                value=f"Mean abs. deviation (MAD): {b['mad']}  →  {b['verdict']}").font = BASE_FONT
+        ws.cell(row=r, column=1, value=f"Mean abs. deviation (MAD): {b['mad']}  →  {b['verdict']}").font = BASE_FONT
         r += 1
         ws.cell(row=r, column=1,
                 value=f"Based on {b['n']} line amounts ≥ 1. MAD bands per Nigrini: "
-                      "<0.006 close, <0.012 acceptable, <0.015 marginal, else investigate."
-                ).font = NOTE_FONT
+                      "<0.006 close, <0.012 acceptable, <0.015 marginal, else investigate.").font = NOTE_FONT
         ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=6)
         ws.cell(row=r, column=1).alignment = Alignment(wrap_text=True, vertical="top")
         ws.row_dimensions[r].height = 30
         r += 1
     else:
-        # NEW: collapse Benford to a single grey line when n is too small
         msg = b.get("verdict") or "Too few amounts for a reliable Benford read"
         ws.cell(row=r, column=1, value=f"Benford diagnostic: {msg} (need ≥ 50 amounts).").font = NOTE_FONT
         ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=6)
@@ -202,60 +245,70 @@ def write_excel(result: RunResult, out_path, source_name: str = "",
 
     # --- Disclaimer ---
     r += 2
-    disclaimer = ("These are RISK INDICATORS for auditor judgement, not findings of error or fraud. "
-                  "Expect false positives — percentile and round-amount tests in particular flag normal "
-                  "items. Investigate flagged entries; clear or document each. Tool runs entirely locally; "
-                  "no ledger data leaves this machine.")
+    disclaimer = ("This workbook documents a review. The automated checks are a first-pass screen "
+                  "that surfaces entries to review — they are not conclusions. A reviewer confirms "
+                  "whether each entry was recorded correctly using support. Runs entirely locally; "
+                  "no ledger or support data leaves this machine.")
     ws.cell(row=r, column=1, value=disclaimer).font = NOTE_FONT
     ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=6)
     ws.cell(row=r, column=1).alignment = Alignment(wrap_text=True, vertical="top")
     ws.row_dimensions[r].height = 60
-
-    for col, w in {"A": 32, "B": 10, "C": 20, "D": 16, "E": 14, "F": 42}.items():
+    for col, w in {"A": 32, "B": 14, "C": 20, "D": 16, "E": 14, "F": 42}.items():
         ws.column_dimensions[col].width = w
     ws.freeze_panes = "A2"
 
     # =========================================================
-    # Exceptions
+    # Review Queue
     # =========================================================
-    we = wb.create_sheet("Exceptions")
-    # Column layout: JE ID, Risk Score, Risk Band, # Tests, Why Flagged, Test IDs, ...
-    # IMPORTANT: Test IDs must remain on column F so Summary COUNTIF can find it.
-    # (We shifted from E to F to fit Risk Band. Summary formulas updated to match.)
+    we = wb.create_sheet(REVIEW_SHEET)
+    # Check IDs MUST stay on column F so the Summary COUNTIF resolves.
     order = ["je_id", "risk_score", "__band", "tests_fired", "reasons", "test_ids",
              "entry_date", "period", "lines", "total_debit", "total_credit",
              "net_amount", "entered_by", "approved_by", "source", "description"]
-    nice = ["JE ID", "Risk Score", "Risk Band", "# Tests", "Why Flagged", "Test IDs",
+    nice = ["JE ID", "Review priority", "Priority", "# Checks", "Why surfaced", "Check IDs",
             "Entry Date", "Period", "Lines", "Total Debit", "Total Credit",
             "Net", "Preparer", "Approver", "Source", "Description"]
+    review_cols = ["__type", "__disp", "__supstat", "__amt", "__date", "__acct",
+                   "__desc", "__support", "__correction", "__reviewer", "__revdate", "__concl"]
+    review_nice = ["Flag Type", "Disposition", "Support Status", "Amount?", "Date?",
+                   "Account?", "Description?", "Support", "Correction", "Reviewer",
+                   "Review Date", "Conclusion"]
+    full_order = order + review_cols
+    full_nice = nice + review_nice
 
-    # We just changed the test_ids column to F. Patch Summary COUNTIFs.
-    for rr in range(test_start_row, test_end_row + 1):
-        cell = ws.cell(row=rr, column=4)
-        if isinstance(cell.value, str) and cell.value.startswith("=COUNTIF(Exceptions!E:E"):
-            cell.value = cell.value.replace("Exceptions!E:E", "Exceptions!F:F")
-
-    df = df_entries
-    if df.empty:
-        df = pd.DataFrame(columns=[c for c in order if not c.startswith("__")])
-
-    df = df.assign(__band=df.get("risk_score", pd.Series([], dtype=float)).map(_risk_band)
+    df = df_entries if not df_entries.empty else pd.DataFrame(columns=[c for c in order if not c.startswith("__")])
+    df = df.assign(__band=df.get("risk_score", pd.Series([], dtype=float)).map(_priority_band)
                    if "risk_score" in df.columns else "")
-
-    # Ensure all expected columns exist
     for c in order:
         if c not in df.columns:
             df[c] = ""
+    df["__type"] = df["flag_type"] if "flag_type" in df.columns else ""
 
-    _dm = dispositions or {}
-    df["__disp"] = df["je_id"].map(lambda j: str((_dm.get(str(j)) or {}).get("disposition", "") or ""))
-    df["__note"] = df["je_id"].map(lambda j: str((_dm.get(str(j)) or {}).get("note", "") or ""))
-    full_order = order + ["__disp", "__note"]
-    full_nice = nice + ["Disposition", "Auditor Note"]
+    # Pull review fields per entry
+    def _f(je, attr, default=""):
+        rc = _rec(reviews, je)
+        if rc is None:
+            return default
+        if attr in ASSERTIONS:
+            return rc.assertions.get(attr, "")
+        if attr == "support":
+            return "; ".join(f"{si.label} ({si.support_type})" for si in rc.support_items if si.label)
+        return getattr(rc, attr, default)
+
+    df["__disp"] = df["je_id"].map(lambda j: _f(j, "disposition", "Open"))
+    df["__supstat"] = df["je_id"].map(lambda j: _f(j, "support_status", ""))
+    df["__amt"] = df["je_id"].map(lambda j: _f(j, "amount"))
+    df["__date"] = df["je_id"].map(lambda j: _f(j, "date"))
+    df["__acct"] = df["je_id"].map(lambda j: _f(j, "account"))
+    df["__desc"] = df["je_id"].map(lambda j: _f(j, "description"))
+    df["__support"] = df["je_id"].map(lambda j: _f(j, "support"))
+    df["__correction"] = df["je_id"].map(lambda j: _f(j, "correction"))
+    df["__reviewer"] = df["je_id"].map(lambda j: _f(j, "reviewer"))
+    df["__revdate"] = df["je_id"].map(lambda j: _f(j, "review_date"))
+    df["__concl"] = df["je_id"].map(lambda j: _f(j, "conclusion"))
 
     we.append(full_nice)
     _style_header(we, 1, len(full_nice))
-
     for _, row in df.iterrows():
         vals = []
         for c in full_order:
@@ -268,144 +321,161 @@ def write_excel(result: RunResult, out_path, source_name: str = "",
             vals.append("" if (isinstance(v, float) and pd.isna(v)) or v is None else v)
         we.append(vals)
 
-    # Cell-level formatting
-    je_col_letter = get_column_letter(full_order.index("je_id") + 1)  # A
-    band_col_letter = get_column_letter(full_order.index("__band") + 1)  # C
-    disp_col_idx = full_order.index("__disp") + 1
-    disp_col_letter = get_column_letter(disp_col_idx)
-
+    band_i = full_order.index("__band")
+    type_i = full_order.index("__type")
+    disp_i = full_order.index("__disp")
     triage_je_rows = _index_triage_je_rows(triage_md) if triage_md else {}
+    wrap_fields = {"reasons", "description", "__concl", "__support", "__correction"}
 
     for rr in range(2, we.max_row + 1):
         for cc in range(1, len(full_nice) + 1):
             cell = we.cell(row=rr, column=cc)
             cell.font = BASE_FONT
-            field = full_order[cc-1]
-            cell.alignment = Alignment(
-                vertical="top",
-                wrap_text=(field in ("reasons", "description", "__note"))
-            )
-        # Number formatting
+            cell.alignment = Alignment(vertical="top", wrap_text=(full_order[cc - 1] in wrap_fields))
         for col_field in ("total_debit", "total_credit", "net_amount"):
-            idx = full_order.index(col_field) + 1
-            we.cell(row=rr, column=idx).number_format = "#,##0.00;(#,##0.00);-"
-
-        # Risk band centered
-        we.cell(row=rr, column=full_order.index("__band") + 1).alignment = \
-            Alignment(horizontal="center", vertical="top")
-
-        # Hyperlink JE ID to its row on the Triage sheet (if triage exists)
+            we.cell(row=rr, column=full_order.index(col_field) + 1).number_format = "#,##0.00;(#,##0.00);-"
+        for ci in (band_i, type_i):
+            we.cell(row=rr, column=ci + 1).alignment = Alignment(horizontal="center", vertical="top")
         if triage_md:
-            je_val = we.cell(row=rr, column=full_order.index("je_id") + 1).value
-            if je_val and str(je_val) in triage_je_rows:
-                target_row = triage_je_rows[str(je_val)]
-                cell = we.cell(row=rr, column=full_order.index("je_id") + 1)
-                cell.hyperlink = f"#Triage!A{target_row}"
-                cell.font = Font(name=FONT, size=10, color="0563C1", underline="single")
+            je_cell = we.cell(row=rr, column=full_order.index("je_id") + 1)
+            if je_cell.value and str(je_cell.value) in triage_je_rows:
+                je_cell.hyperlink = f"#Triage!A{triage_je_rows[str(je_cell.value)]}"
+                je_cell.font = Font(name=FONT, size=10, color="0563C1", underline="single")
 
-    # Color scale on Risk Score (column B)
+    # Conditional formatting
     if we.max_row >= 2:
+        last = we.max_row
         we.conditional_formatting.add(
-            f"B2:B{we.max_row}",
-            ColorScaleRule(start_type="min", start_color="FFFFFF",
-                           end_type="max", end_color="C00000"))
-
-    # Risk Band conditional fills
-    if we.max_row >= 2:
-        band_range = f"{band_col_letter}2:{band_col_letter}{we.max_row}"
-        we.conditional_formatting.add(
-            band_range,
-            CellIsRule(operator="equal", formula=['"High"'],
-                       fill=PatternFill("solid", fgColor="F4B5B5"),
-                       font=Font(name=FONT, size=10, bold=True, color="9C1B1B")))
-        we.conditional_formatting.add(
-            band_range,
-            CellIsRule(operator="equal", formula=['"Medium"'],
-                       fill=PatternFill("solid", fgColor="FFE4A8"),
-                       font=Font(name=FONT, size=10, bold=True, color="9C6A1B")))
-        we.conditional_formatting.add(
-            band_range,
-            CellIsRule(operator="equal", formula=['"Low"'],
-                       fill=PatternFill("solid", fgColor="E2EFDA"),
-                       font=Font(name=FONT, size=10, color="375623")))
-
-    # Disposition dropdown + conditional fills
-    if we.max_row >= 2:
-        disp_range = f"{disp_col_letter}2:{disp_col_letter}{we.max_row}"
-        formula = '"' + ",".join(DISP_CHOICES) + '"'
-        dv = DataValidation(type="list", formula1=formula, allow_blank=True,
-                            showDropDown=False, errorStyle="warning")
-        dv.error = "Pick one of: " + ", ".join(DISP_CHOICES)
-        dv.errorTitle = "Disposition"
-        dv.prompt = "Auditor disposition for this exception."
-        dv.promptTitle = "Disposition"
-        dv.add(disp_range)
-        we.add_data_validation(dv)
-        # Per-choice conditional fill
+            f"B2:B{last}", ColorScaleRule(start_type="min", start_color="FFFFFF",
+                                          end_type="max", end_color="C00000"))
+        band_L = get_column_letter(band_i + 1)
+        for val, fg, fcol in (("High", "F4B5B5", "9C1B1B"), ("Medium", "FFE4A8", "9C6A1B"),
+                              ("Low", "E2EFDA", "375623")):
+            we.conditional_formatting.add(
+                f"{band_L}2:{band_L}{last}",
+                CellIsRule(operator="equal", formula=[f'"{val}"'],
+                           fill=PatternFill("solid", fgColor=fg),
+                           font=Font(name=FONT, size=10, bold=(val == "High"), color=fcol)))
+        type_L = get_column_letter(type_i + 1)
+        for val, fg in (("Accuracy", "DDEBF7"), ("Risk", "FFF4D6"), ("Both", "FCE4D6")):
+            we.conditional_formatting.add(
+                f"{type_L}2:{type_L}{last}",
+                CellIsRule(operator="equal", formula=[f'"{val}"'], fill=PatternFill("solid", fgColor=fg)))
+        # Disposition dropdown + fills
+        disp_L = get_column_letter(disp_i + 1)
+        _add_dropdown(we, disp_L, last, DISPOSITIONS, "Disposition")
         for choice, fill in DISP_FILLS.items():
             we.conditional_formatting.add(
-                disp_range,
-                CellIsRule(operator="equal", formula=[f'"{choice}"'], fill=fill),
-            )
+                f"{disp_L}2:{disp_L}{last}",
+                CellIsRule(operator="equal", formula=[f'"{choice}"'], fill=fill))
+        # Support-status dropdown
+        _add_dropdown(we, get_column_letter(full_order.index("__supstat") + 1), last,
+                      SUPPORT_STATUSES, "Support status")
+        # Assertion dropdowns + fills
+        for key in ("__amt", "__date", "__acct", "__desc"):
+            col_L = get_column_letter(full_order.index(key) + 1)
+            _add_dropdown(we, col_L, last, ASSERTION_OUTCOMES, "Support agrees?")
+            for val, fill in ASSERT_FILLS.items():
+                we.conditional_formatting.add(
+                    f"{col_L}2:{col_L}{last}",
+                    CellIsRule(operator="equal", formula=[f'"{val}"'], fill=fill))
 
-    widths = {"JE ID": 15, "Risk Score": 10, "Risk Band": 11, "# Tests": 9,
-              "Why Flagged": 60, "Test IDs": 22, "Entry Date": 12, "Period": 9,
-              "Lines": 7, "Total Debit": 14, "Total Credit": 14, "Net": 12,
-              "Preparer": 12, "Approver": 12, "Source": 10, "Description": 30,
-              "Disposition": 20, "Auditor Note": 40}
+    widths = {"JE ID": 15, "Review priority": 11, "Priority": 9, "# Checks": 8,
+              "Why surfaced": 52, "Check IDs": 20, "Entry Date": 12, "Period": 9,
+              "Lines": 6, "Total Debit": 13, "Total Credit": 13, "Net": 12,
+              "Preparer": 12, "Approver": 12, "Source": 9, "Description": 26,
+              "Flag Type": 10, "Disposition": 22, "Support Status": 22,
+              "Amount?": 11, "Date?": 11, "Account?": 11, "Description?": 12,
+              "Support": 34, "Correction": 26, "Reviewer": 12, "Review Date": 12,
+              "Conclusion": 40}
     for i, h in enumerate(full_nice, start=1):
         we.column_dimensions[get_column_letter(i)].width = widths.get(h, 14)
-    we.freeze_panes = "A2"
-    we.auto_filter.ref = f"A1:{get_column_letter(len(full_nice))}{max(we.max_row,1)}"
+    we.freeze_panes = "B2"
+    we.auto_filter.ref = f"A1:{get_column_letter(len(full_nice))}{max(we.max_row, 1)}"
 
     # =========================================================
-    # Test Catalog
+    # Support Log
     # =========================================================
-    wc = wb.create_sheet("Test Catalog")
-    chead = ["Test ID", "Test", "Weight", "Scope-fields needed", "Ran?", "Description"]
+    wl = wb.create_sheet("Support Log")
+    lhead = ["JE ID", "Support", "Type", "Covers", "Agrees?", "Note"]
+    wl.append(lhead)
+    _style_header(wl, 1, len(lhead))
+    any_support = False
+    for je in flagged_ids:
+        rc = _rec(reviews, je)
+        if not rc:
+            continue
+        for si in rc.support_items:
+            if not si.label and not si.note:
+                continue
+            any_support = True
+            wl.append([je, si.label, si.support_type, ", ".join(si.covers), si.agrees, si.note])
+    if not any_support:
+        wl.append(["—", "No support items recorded yet.", "", "", "", ""])
+        wl.cell(row=2, column=2).font = MUTED_FONT
+    for rr in range(2, wl.max_row + 1):
+        for cc in range(1, len(lhead) + 1):
+            wl.cell(row=rr, column=cc).font = BASE_FONT
+            wl.cell(row=rr, column=cc).alignment = Alignment(vertical="top", wrap_text=(cc == 6))
+    if not any_support:
+        wl.cell(row=2, column=2).font = MUTED_FONT
+    for col, w in {"A": 15, "B": 34, "C": 18, "D": 22, "E": 14, "F": 50}.items():
+        wl.column_dimensions[col].width = w
+    wl.freeze_panes = "A2"
+
+    # =========================================================
+    # Triage checks
+    # =========================================================
+    wc = wb.create_sheet("Triage checks")
+    use_score = bool(scorecard)
+    chead = ["Check ID", "Check", "Category", "Weight", "Fields needed", "Ran?", "Description"]
+    if use_score:
+        chead += ["Surfaced", "Benign", "Issues", "Signal"]
     wc.append(chead)
     _style_header(wc, 1, len(chead))
     for _, row in result.rule_summary.iterrows():
         ran = bool(row["ran"])
-        wc.append([row["rule_id"], row["label"], int(row["weight"]),
-                   row["requires"], "Yes" if ran else "No", row["description"]])
+        rowvals = [row["rule_id"], row["label"], row.get("category", "Risk"), int(row["weight"]),
+                   row["requires"], "Yes" if ran else "No", row["description"]]
+        if use_score:
+            sc = scorecard.get(row["rule_id"], {})
+            rowvals += [sc.get("surfaced", ""), sc.get("accepted", ""), sc.get("issue", ""),
+                        sc.get("recommendation", "")]
+        wc.append(rowvals)
         rr = wc.max_row
-        if not ran:
-            for cc in range(1, len(chead) + 1):
-                wc.cell(row=rr, column=cc).fill = SKIPPED_ROW_FILL
-                wc.cell(row=rr, column=cc).font = MUTED_FONT
-    for rr in range(2, wc.max_row + 1):
         for cc in range(1, len(chead) + 1):
-            if wc.cell(row=rr, column=cc).font.color is None or wc.cell(row=rr, column=cc).font.color.rgb != MUTED_FONT.color.rgb:
-                wc.cell(row=rr, column=cc).font = BASE_FONT
-            wc.cell(row=rr, column=cc).alignment = Alignment(vertical="top", wrap_text=(cc == 6))
-    for col, w in {"A": 22, "B": 30, "C": 8, "D": 24, "E": 8, "F": 70}.items():
+            cell = wc.cell(row=rr, column=cc)
+            cell.font = BASE_FONT if ran else MUTED_FONT
+            if not ran:
+                cell.fill = SKIPPED_ROW_FILL
+            cell.alignment = Alignment(vertical="top", wrap_text=(cc in (7, len(chead))))
+    cwidths = {"A": 24, "B": 26, "C": 11, "D": 8, "E": 22, "F": 7, "G": 60}
+    if use_score:
+        cwidths.update({"H": 10, "I": 9, "J": 8, "K": 34})
+    for col, w in cwidths.items():
         wc.column_dimensions[col].width = w
     wc.freeze_panes = "A2"
 
     # =========================================================
-    # Triage (optional)
+    # Triage Notes (optional)
     # =========================================================
     if triage_md:
         wt = wb.create_sheet("Triage")
         wt["A1"] = "Triage Notes"
         wt["A1"].font = TITLE_FONT
-        row = 3
+        rownum = 3
         for line in triage_md.splitlines():
-            cell = wt.cell(row=row, column=1, value=line)
+            cell = wt.cell(row=rownum, column=1, value=line)
             if line.startswith("## "):
                 cell.value = line[3:]
                 cell.font = Font(name=FONT, bold=True, size=11, color="1F3864")
             elif line.startswith("# "):
                 cell.value = line[2:]
                 cell.font = Font(name=FONT, bold=True, size=12)
-            elif line.startswith("**") or line.startswith("_"):
-                cell.font = Font(name=FONT, italic=line.startswith("_"),
-                                 bold=line.startswith("**"), size=10)
             else:
                 cell.font = BASE_FONT
             cell.alignment = Alignment(wrap_text=True, vertical="top")
-            row += 1
+            rownum += 1
         wt.column_dimensions["A"].width = 110
         wt.freeze_panes = "A2"
 
@@ -413,24 +483,20 @@ def write_excel(result: RunResult, out_path, source_name: str = "",
     return target
 
 
-def _population_shape(df_entries: pd.DataFrame, result: RunResult) -> list[tuple]:
-    """Build a small list of population-shape metrics for the Summary sheet."""
+def _population_shape(df_entries: pd.DataFrame, result: RunResult) -> list:
     rows = []
     stats = result.stats or {}
-    # Unique counts pulled from rule_summary inputs or entries
     if not df_entries.empty:
         if "entered_by" in df_entries.columns:
-            unique_preparers = df_entries["entered_by"].nunique()
-            rows.append(("Unique preparers (flagged)", int(unique_preparers)))
+            rows.append(("Unique preparers (surfaced)", int(df_entries["entered_by"].nunique())))
         if "approved_by" in df_entries.columns:
-            unique_approvers = df_entries["approved_by"].nunique()
-            rows.append(("Unique approvers (flagged)", int(unique_approvers)))
+            rows.append(("Unique approvers (surfaced)", int(df_entries["approved_by"].nunique())))
         if "entry_date" in df_entries.columns:
             try:
                 dates = pd.to_datetime(df_entries["entry_date"], errors="coerce").dropna()
                 if not dates.empty:
-                    rows.append(("Earliest flagged entry date", dates.min().strftime("%Y-%m-%d")))
-                    rows.append(("Latest flagged entry date", dates.max().strftime("%Y-%m-%d")))
+                    rows.append(("Earliest surfaced date", dates.min().strftime("%Y-%m-%d")))
+                    rows.append(("Latest surfaced date", dates.max().strftime("%Y-%m-%d")))
             except Exception:
                 pass
         for amt_col in ("total_debit", "net_amount"):
@@ -438,50 +504,54 @@ def _population_shape(df_entries: pd.DataFrame, result: RunResult) -> list[tuple
                 try:
                     series = pd.to_numeric(df_entries[amt_col], errors="coerce").dropna().abs()
                     if not series.empty:
-                        label = "Total flagged $ (debits)" if amt_col == "total_debit" else "Total flagged net $"
+                        label = "Total surfaced $ (debits)" if amt_col == "total_debit" else "Total surfaced net $"
                         rows.append((label, round(float(series.sum()), 2)))
                         break
                 except Exception:
                     pass
-    # Fall back to whatever the engine put in stats
     for key in ("avg_entry_amount", "max_entry_amount"):
         if key in stats:
             rows.append((key.replace("_", " ").capitalize(), stats[key]))
     if not rows:
-        rows.append(("(no flagged entries)", "—"))
+        rows.append(("(no surfaced entries)", "—"))
     return rows
 
 
 def _index_triage_je_rows(triage_md: str) -> dict:
-    """Find which row each JE ID appears on in the Triage sheet output.
-
-    Triage notes use header lines like 'ADV-2024-0005  ·  risk 3  ·  2 test(s)'.
-    Returns {je_id: triage_sheet_row_number}.
-    """
     je_rows: dict[str, int] = {}
-    # Triage sheet writes starting at row 3, one row per source line.
-    row = 3
+    rownum = 3
     for line in triage_md.splitlines():
         stripped = line.strip()
-        # Header lines look like "ADV-2024-0005  ·  risk 3  ·  2 test(s)"
         if "  ·  risk " in stripped or " · risk " in stripped:
-            # Strip markdown header markers (##, ###) before extracting JE ID
             cleaned = stripped.lstrip("#").strip()
             je_id = cleaned.split()[0] if cleaned else ""
             if je_id and je_id not in je_rows:
-                je_rows[je_id] = row
-        row += 1
+                je_rows[je_id] = rownum
+        rownum += 1
     return je_rows
 
 
-def write_csv(result: RunResult, out_path, dispositions: dict | None = None):
+def write_csv(result: RunResult, out_path, reviews: dict | None = None):
     target = out_path if hasattr(out_path, "write") else Path(out_path)
     df = result.entries.copy()
     if "risk_score" in df.columns:
-        df.insert(df.columns.get_loc("risk_score") + 1, "risk_band",
-                  df["risk_score"].map(_risk_band))
-    if dispositions:
-        df["disposition"] = df["je_id"].map(lambda j: str((dispositions.get(str(j)) or {}).get("disposition", "") or ""))
-        df["auditor_note"] = df["je_id"].map(lambda j: str((dispositions.get(str(j)) or {}).get("note", "") or ""))
+        df.insert(df.columns.get_loc("risk_score") + 1, "priority_band",
+                  df["risk_score"].map(_priority_band))
+    if reviews:
+        def g(j, attr):
+            rc = _rec(reviews, j)
+            if rc is None:
+                return ""
+            if attr in ASSERTIONS:
+                return rc.assertions.get(attr, "")
+            return getattr(rc, attr, "")
+        df["disposition"] = df["je_id"].map(lambda j: g(j, "disposition"))
+        df["support_status"] = df["je_id"].map(lambda j: g(j, "support_status"))
+        for a in ASSERTIONS:
+            df[f"{a}_agrees"] = df["je_id"].map(lambda j, a=a: g(j, a))
+        df["correction"] = df["je_id"].map(lambda j: g(j, "correction"))
+        df["reviewer"] = df["je_id"].map(lambda j: g(j, "reviewer"))
+        df["review_date"] = df["je_id"].map(lambda j: g(j, "review_date"))
+        df["conclusion"] = df["je_id"].map(lambda j: g(j, "conclusion"))
     df.to_csv(target, index=False)
     return target

@@ -30,13 +30,15 @@ def run_pipeline(raw_df: pd.DataFrame, *, mapping: dict | None = None,
                  threshold: float | None = None, triage: str = "none",
                  top_n: int = 10, provider: str = "anthropic",
                  model: str = "claude-sonnet-4-20250514", api_key: str = "",
-                 source_name: str = "upload") -> Output:
+                 source_name: str = "upload", coa: set | None = None) -> Output:
     cm = ColumnMapping(mapping=mapping) if mapping else ColumnMapping.identity(list(raw_df.columns))
     df = normalize(raw_df, cm)
 
     ctx = RuleContext(available=set())
     if threshold is not None:
         ctx.approval_threshold = threshold
+    if coa:
+        ctx.known_accounts = set(coa)
     result = run(df, ctx)
 
     triage_md, used_ai = None, False
@@ -57,12 +59,14 @@ def run_pipeline(raw_df: pd.DataFrame, *, mapping: dict | None = None,
 
 
 def workpaper_bytes(result: RunResult, *, source_name: str = "upload",
-                    triage_md: str | None = None, dispositions: dict | None = None):
-    """Regenerate the Excel + CSV workpaper bytes from a RunResult, optionally
-    folding in auditor dispositions. Used by the UI to refresh downloads after
-    the reviewer edits dispositions, without re-running the engine."""
+                    triage_md: str | None = None, reviews: dict | None = None,
+                    scorecard: dict | None = None):
+    """Regenerate the Excel + CSV workpaper bytes from a RunResult, folding in
+    the reviewer's support-review records. Used by the UI to refresh downloads
+    after edits, without re-running the engine."""
     import io
     xbuf, cbuf = io.BytesIO(), io.StringIO()
-    write_excel(result, xbuf, source_name=source_name, triage_md=triage_md, dispositions=dispositions)
-    write_csv(result, cbuf, dispositions=dispositions)
+    write_excel(result, xbuf, source_name=source_name, triage_md=triage_md,
+                reviews=reviews, scorecard=scorecard)
+    write_csv(result, cbuf, reviews=reviews)
     return xbuf.getvalue(), cbuf.getvalue().encode("utf-8")

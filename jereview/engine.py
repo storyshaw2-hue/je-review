@@ -60,12 +60,13 @@ def run(df: pd.DataFrame, ctx: RuleContext | None = None) -> RunResult:
     score: dict[str, int] = {}
     rule_rows = []
     skipped = []
+    cat_map = {r.id: r.category for r in RULES}
 
     for r in RULES:
         if not r.runnable(available):
             skipped.append(r.id)
             rule_rows.append({"rule_id": r.id, "label": r.label, "weight": r.weight,
-                              "ran": False, "entries_flagged": 0,
+                              "ran": False, "entries_flagged": 0, "category": r.category,
                               "requires": ",".join(r.requires), "description": r.description})
             continue
         hits = r.func(df, ctx) or {}
@@ -74,7 +75,7 @@ def run(df: pd.DataFrame, ctx: RuleContext | None = None) -> RunResult:
             tests.setdefault(je, []).append(r.id)
             score[je] = score.get(je, 0) + r.weight
         rule_rows.append({"rule_id": r.id, "label": r.label, "weight": r.weight,
-                          "ran": True, "entries_flagged": len(hits),
+                          "ran": True, "entries_flagged": len(hits), "category": r.category,
                           "requires": ",".join(r.requires), "description": r.description})
 
     # entry-level rollup of identity fields
@@ -89,14 +90,21 @@ def run(df: pd.DataFrame, ctx: RuleContext | None = None) -> RunResult:
         total_credit=("credit", "sum"),
         net_amount=("amount", "sum"),
         description=("description", lambda s: " | ".join(sorted({str(x) for x in s.dropna() if str(x).strip()}))),
+        accounts=("account", lambda s: ", ".join(sorted({str(x).strip() for x in s.dropna() if str(x).strip()}))),
     )
 
     rows = []
     for je in score:
         a = agg.loc[je]
+        _acc = [i for i in tests[je] if cat_map.get(i) == "Accuracy"]
+        _rsk = [i for i in tests[je] if cat_map.get(i) == "Risk"]
+        _ftype = "Both" if (_acc and _rsk) else ("Accuracy" if _acc else "Risk")
         rows.append({
             "je_id": je,
             "risk_score": score[je],
+            "flag_type": _ftype,
+            "accuracy_tests": len(_acc),
+            "risk_tests": len(_rsk),
             "tests_fired": len(tests[je]),
             "test_ids": ", ".join(tests[je]),
             "reasons": " ; ".join(reasons[je]),
@@ -110,6 +118,7 @@ def run(df: pd.DataFrame, ctx: RuleContext | None = None) -> RunResult:
             "approved_by": a["approved_by"],
             "source": a["source"],
             "description": a["description"],
+            "accounts": a["accounts"],
         })
     entries = pd.DataFrame(rows)
     if not entries.empty:
@@ -121,6 +130,8 @@ def run(df: pd.DataFrame, ctx: RuleContext | None = None) -> RunResult:
         "flagged_entries": int(len(entries)),
         "flagged_pct": round(100 * len(entries) / max(df["je_id"].nunique(), 1), 1),
         "periods": ", ".join(sorted(set(df["period"].dropna()))),
+        "accuracy_entries": int((entries["flag_type"].isin(["Accuracy", "Both"])).sum()) if not entries.empty else 0,
+        "risk_entries": int((entries["flag_type"].isin(["Risk", "Both"])).sum()) if not entries.empty else 0,
     }
     return RunResult(
         entries=entries,
