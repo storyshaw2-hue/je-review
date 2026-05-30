@@ -39,16 +39,61 @@ SUP_COLS = ["JE ID", "Support", "Type", "Covers", "Agrees?", "Note"]
 
 
 def render(allow_ai: bool = True) -> None:
-    st.set_page_config(page_title="JE Review & Support Validation", page_icon="🧾", layout="wide")
+    st.set_page_config(
+        page_title="JE Review & Support Validation",
+        page_icon="🧾",
+        layout="wide",
+        menu_items={
+            "Get Help": "https://github.com/storyshaw2-hue/je-review",
+            "Report a bug": "https://github.com/storyshaw2-hue/je-review/issues",
+            "About": (
+                "**JE Risk Review** — a privacy-first journal-entry review tool. "
+                "All processing happens in your browser; nothing is uploaded. "
+                "Built by Story Shaw · v0.2.0 · "
+                "[GitHub](https://github.com/storyshaw2-hue/je-review)"
+            ),
+        },
+    )
+    # Hide Streamlit's default chrome (header, footer, deploy button) for a cleaner product feel
+    st.markdown(
+        """
+        <style>
+          #MainMenu { visibility: visible; }
+          header[data-testid="stHeader"] { background: transparent; }
+          footer { visibility: hidden; }
+          .stDeployButton { display: none; }
+          div[data-testid="stToolbar"] { right: 8px; }
+          /* tighten top padding so the header is closer to the top */
+          .block-container { padding-top: 2rem; }
+          /* custom footer */
+          .je-footer {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #F5F7FB; border-top: 1px solid #E5E9F0;
+            padding: 8px 16px; font-size: 12px; color: #555;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            display: flex; justify-content: space-between; z-index: 100;
+          }
+          .je-footer a { color: #1F3864; text-decoration: none; }
+          .je-footer a:hover { text-decoration: underline; }
+          /* make sample-data callout pop */
+          .stAlert[data-baseweb="notification"] { border-radius: 8px; }
+        </style>
+        <div class="je-footer">
+          <span>🔒 All data stays in your browser — nothing is uploaded</span>
+          <span>Built by <a href="https://github.com/storyshaw2-hue" target="_blank">Story Shaw</a> · v0.2.0 · <a href="https://github.com/storyshaw2-hue/je-review" target="_blank">Source on GitHub</a></span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.title("🧾 Journal Entry Review")
-    st.caption("Review journal entries and confirm they were recorded correctly — using support.")
+    st.caption("Review journal entries and confirm they were recorded correctly using supporting documentation.")
     if allow_ai:
         st.caption("Runs on this machine. Nothing leaves it unless you turn on AI triage below.")
     else:
         st.caption("Runs entirely in your browser. Your ledger and support never leave this computer.")
 
     with st.sidebar:
-        st.header("Options")
+        st.header("Review Settings")
         threshold = st.number_input("Approval threshold ($)", min_value=0, value=50000, step=1000,
                                     help="Used by the 'just below threshold' check.")
         st.divider()
@@ -74,12 +119,76 @@ def render(allow_ai: bool = True) -> None:
                                     help="A prior export. Restores in-progress reviews and powers "
                                          "'previously concluded' suggestions for recurring entries.")
 
-    uploaded = st.file_uploader("Upload a journal-entry export (.csv or .xlsx)", type=["csv", "xlsx", "xlsm"])
+    # ----- Onboarding callout: first-time users get a sample-data path -----
+    if "sample_loaded" not in st.session_state:
+        st.session_state.sample_loaded = False
+
+    with st.expander("👋 First time here? Try the sample data", expanded=not st.session_state.sample_loaded):
+        col_a, col_b = st.columns([3, 1])
+        with col_a:
+            st.markdown(
+                "**No file? Click below to load a sample journal-entry export with 10+ planted errors** "
+                "(IC reciprocity gaps, cutoff issues, wrong-account postings, premature revenue). "
+                "You'll see exactly what the tool surfaces."
+            )
+            st.caption(
+                "Sample includes: `sample_je_errors.csv` (the ledger) + an optional chart-of-accounts file. "
+                "Real exports just need columns: `je_id`, `entry_date`, `account`, `amount` (or `debit`/`credit`)."
+            )
+        with col_b:
+            if st.button("✨ Load sample", type="secondary", use_container_width=True):
+                st.session_state.sample_loaded = True
+                st.rerun()
+
+    # Expected schema reference (collapsed by default)
+    with st.expander("📋 Expected column schema"):
+        st.markdown(
+            """
+            Your export should have these columns (case-insensitive, common synonyms auto-mapped):
+
+            | Field | Required? | Notes |
+            |---|---|---|
+            | `je_id` | ✅ yes | Journal entry / document number (groups debit & credit lines) |
+            | `entry_date` | ✅ yes | Date the entry was posted |
+            | `account` | ✅ yes | GL account number |
+            | `amount` | ⚠️ either | Signed amount (debit +, credit −) |
+            | `debit` / `credit` | ⚠️ or both | Use instead of `amount` |
+            | `account_name` | optional | GL account description |
+            | `description` | optional | Line or header narrative |
+            | `entered_by` | optional | Preparer / user who posted (powers segregation-of-duties check) |
+            | `approved_by` | optional | Approver (powers SoD check) |
+            | `posted_at` | optional | Full timestamp (powers off-hours check) |
+            | `source` | optional | 'Manual' / 'System' / 'Auto' |
+
+            **If your columns don't match these names**, upload a Column Mapping JSON in the sidebar. "
+            [See example mapping](https://github.com/storyshaw2-hue/je-review/blob/main/mapping.example.json).
+            """
+        )
+
+    uploaded = st.file_uploader(
+        "Upload a journal-entry export (.csv or .xlsx)",
+        type=["csv", "xlsx", "xlsm"],
+        help="CSV, XLSX, or XLSM. Stays in your browser — not uploaded anywhere.",
+    )
+
+    # If user clicked sample, swap in the bundled sample file
+    if st.session_state.sample_loaded and uploaded is None:
+        try:
+            from pathlib import Path as _Path
+            sample_path = _Path(__file__).parent.parent / "sample_data" / "sample_je_errors.csv"
+            if sample_path.exists():
+                st.info(f"✨ Using sample data: `{sample_path.name}` — click **Run review** to see the output.")
+                uploaded = sample_path.open("rb")
+            else:
+                st.warning("Sample data not found in this build. Upload your own file instead.")
+        except Exception as e:  # noqa: BLE001
+            st.warning(f"Could not load sample: {e}")
+
     run_clicked = st.button("Run review", type="primary")
 
     if run_clicked:
         if uploaded is None:
-            st.warning("Upload a journal-entry file first, then click Run review.")
+            st.warning("Upload a journal-entry file first, then click Run review. (Or click ‘Load sample’ above.)")
         else:
             try:
                 if uploaded.name.lower().endswith((".xlsx", ".xlsm")):
