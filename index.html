@@ -102,9 +102,11 @@
       if (pct) pct.textContent = Math.round(target) + '%';
     }, 200);
     var obs = new MutationObserver(function () {
-      var mounted = document.querySelector('[data-testid="stAppViewContainer"]') ||
-                    document.querySelector('.stApp') ||
-                    document.querySelector('iframe[title="streamlit"]');
+      // Wait for a REAL interactive element, not just the skeleton.
+      // stFileUploader appears only after Pyodide + Streamlit + our app code all loaded.
+      var mounted = document.querySelector('[data-testid="stFileUploader"]') ||
+                    document.querySelector('[data-testid="stSidebar"] [data-testid="stHeader"]') ||
+                    document.querySelector('button[kind="primary"]');
       if (mounted) {
         // Snap to 100% briefly so users see completion before fade.
         if (fill) fill.style.width = '100%';

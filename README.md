@@ -1,8 +1,47 @@
-# jereview — local journal-entry risk testing
+# JE Risk Review — local-only journal-entry testing
+
+> **🔗 Try it live (no install): [storyshaw2-hue.github.io/je-review](https://storyshaw2-hue.github.io/je-review/)**
+> Runs entirely in your browser. Your ledger never leaves your computer.
+
+![JE Risk Review screenshot](docs/screenshot.png)
 
 A small, **local-only** tool that runs the standard AU-C 240 journal-entry risk
 battery over a company's general-ledger export and produces a ranked exceptions
 **workpaper** (Excel + CSV) for internal audit / controllership to triage.
+
+## Why it exists
+
+Most JE-testing tools either (a) require you to upload your ledger to a vendor's
+cloud or (b) cost thousands per seat. This is neither. It runs on your laptop or
+in your browser via WebAssembly (Pyodide) — no server, no account, no egress.
+
+## What it does
+
+- **28 automated checks** across two categories:
+  - **Accuracy** — unbalanced entries, debit/credit on same line, missing accounts,
+    period/date mismatches, excess precision
+  - **Risk** — weekend posting, after-period-end, manual source, SoD conflicts,
+    blank descriptions, suspicious keywords, round-dollar amounts, just-below-threshold,
+    seldom-used accounts, duplicates, quick reversals, off-hours posting, rare users,
+    sensitive accounts, single-sided entries, future dates, account/name mismatches,
+    unknown accounts (vs your COA), and more
+- **Composite risk score** per entry so you can triage worst-first
+- **Review queue UI** — record disposition, support agreement on 4 assertions
+  (Amount / Date / Account / Description), proposed corrections, and conclusions
+- **Review memory** — export your dispositions, re-upload next period to auto-suggest
+  conclusions for recurring entries
+- **Workpaper export** — Excel + CSV with everything you'd put in an audit binder
+
+## Two ways to run
+
+### 1. Browser (zero install)
+[storyshaw2-hue.github.io/je-review](https://storyshaw2-hue.github.io/je-review/) —
+first load takes ~15–60s to download Pyodide; cached after that. Click **✨ Load sample**
+on the landing page to see it work without uploading anything.
+
+### 2. CLI / Python package (for batch use)
+See install instructions below. CLI is faster for large ledgers and integrates
+into close pipelines.
 
 - **Runs entirely on your machine.** No GL data leaves the building, no API
   calls, no account required. That is the point.
