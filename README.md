@@ -104,6 +104,27 @@ entries, and flags 0 clean entries. **That 0% false-positive rate is a property
 of the controlled synthetic set — a real ledger will produce more noise**, which
 is expected for a first-pass screen.
 
+## What this tool will NOT do
+
+Be explicit about this before sending the workbook to a partner or client:
+
+- **It will not conclude on fraud.** Hits are *risk indicators for auditor
+  judgement* — every exception still needs corroboration, documentation, and
+  professional skepticism.
+- **It will not replace your JE testing workpaper.** It feeds it. Reasoning,
+  selections rationale, and dispositions still come from the engagement team.
+- **It will not test population completeness.** Reconcile your export to the
+  trial balance / GL control totals *before* you run this — otherwise you're
+  testing an incomplete file.
+- **It will not validate your column mapping.** If you mis-map `posted_at` to
+  `entry_date`, off-hours and back-dating tests will silently lie. Spot-check
+  the first run against a known JE.
+- **It will not phone home.** No telemetry, no API calls (unless you explicitly
+  opt in to AI triage with your own key), no account. The browser build runs
+  100% in-WASM; the CLI runs 100% on your machine.
+- **It will not replace ASC 250 / ASC 740 / SOX judgement.** Risk weights and
+  thresholds in `rules.py` are starting points, not GAAP.
+
 ## Limitations (read before relying on it)
 
 - Outputs are leads to investigate, not conclusions. Document the disposition of

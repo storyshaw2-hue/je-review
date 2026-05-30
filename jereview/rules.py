@@ -59,6 +59,8 @@ class RuleContext:
     offhours_end: int = 6                   # 6am
     period_end_days: int = 3                # last N calendar days of the month
     materiality_floor: float = 0.0          # ignore amounts below this for outliers
+    reversal_window_days: int = 5           # quick-reversal look-around window (days)
+    rare_user_max_entries: int = 2          # user posting <= N entries counts as "rare"
     sensitive_account_keywords: list = field(default_factory=lambda: [
         "suspense", "clearing", "reserve", "accrual", "equity", "revenue",
         "intercompany", "ic ", "related party", "goodwill", "impairment",
@@ -272,3 +274,120 @@ def r_unbalanced(df, ctx):
     net = df.groupby("je_id")["amount"].sum().round(2)
     flagged = net[net.abs() > 0.005]
     return {je: f"Out of balance by ${v:,.2f}" for je, v in flagged.items()}
+
+
+# ---------------------------------------------------------------------------
+# CROSS-ENTRY / POPULATION rules
+# (these compare entries against each other, not just within one entry)
+# ---------------------------------------------------------------------------
+
+def _entry_signature(sub: pd.DataFrame) -> tuple:
+    """A normalized (account, signed-amount) fingerprint for an entry's lines."""
+    return tuple(sorted(
+        (str(a), round(float(v), 2))
+        for a, v in zip(sub["account"].fillna(""), sub["amount"].fillna(0.0))
+    ))
+
+
+@rule("DUPLICATE_ENTRY", "Possible duplicate entry", "entry", 3, ["account", "amount"],
+      "Another entry posts the identical set of account/amount lines — possible duplicate "
+      "posting or double-paid invoice.")
+def r_duplicate(df, ctx):
+    from collections import defaultdict
+    groups = defaultdict(list)
+    for je, sub in df.groupby("je_id"):
+        sig = _entry_signature(sub)
+        if sig and any(v != 0 for _, v in sig):
+            groups[sig].append(je)
+    out = {}
+    for jes in groups.values():
+        if len(jes) > 1:
+            for je in jes:
+                others = [x for x in jes if x != je]
+                shown = ", ".join(sorted(others)[:3]) + ("…" if len(others) > 3 else "")
+                n = len(others)
+                out[je] = f"Identical account/amount lines to {n} other entr{'y' if n == 1 else 'ies'}: {shown}"
+    return out
+
+
+@rule("QUICK_REVERSAL", "Reversed shortly after posting", "entry", 2,
+      ["entry_date", "account", "amount"],
+      "An equal-and-opposite entry posts within a few days — possible window-dressing or a "
+      "temporary booking that was backed out.")
+def r_quick_reversal(df, ctx):
+    from collections import defaultdict
+    per = {}
+    for je, sub in df.groupby("je_id"):
+        sig = _entry_signature(sub)
+        d = sub["entry_date"].dropna()
+        per[je] = (sig, d.iloc[0] if len(d) else pd.NaT)
+    by_sig = defaultdict(list)
+    for je, (sig, d) in per.items():
+        if sig:
+            by_sig[sig].append((je, d))
+    out = {}
+    for je, (sig, d) in per.items():
+        if not sig or pd.isna(d) or not any(v != 0 for _, v in sig):
+            continue
+        neg = tuple(sorted((a, round(-v, 2)) for a, v in sig))
+        if neg == sig:
+            continue
+        for je2, d2 in by_sig.get(neg, []):
+            if je2 == je or pd.isna(d2):
+                continue
+            delta = abs((d2 - d).days)
+            if delta <= ctx.reversal_window_days:
+                out[je] = f"Equal-and-opposite to {je2} ({delta} day(s) apart)"
+                break
+    return out
+
+
+@rule("NUMBERING_GAP", "Gap in entry numbering", "entry", 1, ["je_id"],
+      "A break in the journal-entry number sequence precedes this entry — possible deleted, "
+      "voided, or unrecorded entries.")
+def r_numbering_gap(df, ctx):
+    import re
+    from collections import defaultdict
+    pat = re.compile(r"^(.*?)(\d+)\s*$")
+    byprefix = defaultdict(set)
+    for x in df["je_id"].dropna().astype(str).unique():
+        m = pat.match(x.strip())
+        if m:
+            byprefix[m.group(1)].add((int(m.group(2)), x.strip()))
+    out = {}
+    for items in byprefix.values():
+        items = sorted(items)
+        if len(items) < 5:                       # need a real sequence to judge
+            continue
+        nums = [n for n, _ in items]
+        span = nums[-1] - nums[0] + 1
+        if span <= 0 or len(nums) / span < 0.7:  # only when mostly contiguous
+            continue
+        for i in range(1, len(items)):
+            prev, cur = items[i - 1][0], items[i][0]
+            if cur - prev > 1:
+                missing = cur - prev - 1
+                out[items[i][1]] = (f"{missing} entry number(s) missing before this entry "
+                                    f"(…{prev} → …{cur})")
+    return out
+
+
+@rule("RARE_USER", "Posted by an infrequent user", "entry", 2, ["entered_by"],
+      "Entry was posted by a user who rarely posts journal entries in this population — "
+      "unfamiliar preparers warrant a closer look.")
+def r_rare_user(df, ctx):
+    by = df.groupby("je_id")["entered_by"].first().dropna()
+    by = by[by.astype(str).str.strip() != ""]
+    if by.empty:
+        return {}
+    counts = by.value_counts()
+    rare_users = set(counts[counts <= ctx.rare_user_max_entries].index)
+    rare_entries = by[by.isin(rare_users)]
+    # guard: if "rare" users are actually a large share, the signal is meaningless
+    if len(rare_entries) > 0.20 * len(by):
+        return {}
+    out = {}
+    for je, u in rare_entries.items():
+        c = int(counts[u])
+        out[je] = f"Posted by infrequent user '{u}' ({c} entr{'y' if c == 1 else 'ies'} in file)"
+    return out

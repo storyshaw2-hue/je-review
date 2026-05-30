@@ -1,0 +1,25 @@
+je_id,line_no,entry_date,effective_date,period,account,account_name,description,debit,credit,entered_by,approved_by,source
+ADV-2024-0001,1,2024-11-04,2024-11-04,2024-11,6100,Consulting Expense,Consultant invoice,4200.50,0.00,arivera,mgr_lee,System
+ADV-2024-0001,2,2024-11-04,2024-11-04,2024-11,2000,Trade Payables,Consultant invoice,0.00,4200.50,arivera,mgr_lee,System
+ADV-2024-0002,1,2024-11-05,2024-11-05,2024-11,6200,Marketing Expense,Ad spend,3120.00,0.00,bchen,mgr_lee,System
+ADV-2024-0002,2,2024-11-05,2024-11-05,2024-11,2000,Trade Payables,Ad spend,0.00,3120.00,bchen,mgr_lee,System
+ADV-2024-0003,1,2024-11-06,2024-11-06,2024-11,6300,Software Expense,SaaS renewal,7777.25,0.00,arivera,mgr_lee,System
+ADV-2024-0003,2,2024-11-06,2024-11-06,2024-11,2000,Trade Payables,SaaS renewal,0.00,7777.25,arivera,mgr_lee,System
+ADV-2024-0004,1,2024-11-07,2024-11-07,2024-11,6100,Consulting Expense,Consultant invoice,2510.75,0.00,bchen,mgr_lee,System
+ADV-2024-0004,2,2024-11-07,2024-11-07,2024-11,2000,Trade Payables,Consultant invoice,0.00,2510.75,bchen,mgr_lee,System
+ADV-2024-0005,1,2024-11-08,2024-11-08,2024-11,7000,Accrued Expense,Accrue bonus,8150.00,0.00,arivera,mgr_lee,System
+ADV-2024-0005,2,2024-11-08,2024-11-08,2024-11,2000,Trade Payables,Accrue bonus,0.00,8150.00,arivera,mgr_lee,System
+ADV-2024-0006,1,2024-11-11,2024-11-11,2024-11,2000,Trade Payables,Reverse bonus accrual,8150.00,0.00,arivera,mgr_lee,System
+ADV-2024-0006,2,2024-11-11,2024-11-11,2024-11,7000,Accrued Expense,Reverse bonus accrual,0.00,8150.00,arivera,mgr_lee,System
+ADV-2024-0007,1,2024-11-12,2024-11-12,2024-11,6200,Marketing Expense,Ad spend,1999.99,0.00,bchen,mgr_lee,System
+ADV-2024-0007,2,2024-11-12,2024-11-12,2024-11,2000,Trade Payables,Ad spend,0.00,1999.99,bchen,mgr_lee,System
+ADV-2024-0010,1,2024-11-13,2024-11-13,2024-11,6100,Consulting Expense,Consultant invoice,3400.00,0.00,bchen,mgr_lee,System
+ADV-2024-0010,2,2024-11-13,2024-11-13,2024-11,2000,Trade Payables,Consultant invoice,0.00,3400.00,bchen,mgr_lee,System
+ADV-2024-0011,1,2024-11-14,2024-11-14,2024-11,6300,Software Expense,SaaS renewal,7777.25,0.00,bchen,mgr_lee,System
+ADV-2024-0011,2,2024-11-14,2024-11-14,2024-11,2000,Trade Payables,SaaS renewal,0.00,7777.25,bchen,mgr_lee,System
+ADV-2024-0012,1,2024-11-15,2024-11-15,2024-11,6200,Marketing Expense,Ad spend,5300.25,0.00,arivera,mgr_lee,System
+ADV-2024-0012,2,2024-11-15,2024-11-15,2024-11,2000,Trade Payables,Ad spend,0.00,5300.25,arivera,mgr_lee,System
+ADV-2024-0013,1,2024-11-18,2024-11-18,2024-11,6200,Marketing Expense,Ad spend,4250.00,0.00,tempx,mgr_lee,System
+ADV-2024-0013,2,2024-11-18,2024-11-18,2024-11,2000,Trade Payables,Ad spend,0.00,4250.00,tempx,mgr_lee,System
+ADV-2024-0014,1,2024-11-19,2024-11-19,2024-11,6100,Consulting Expense,Consultant invoice,2755.00,0.00,arivera,mgr_lee,System
+ADV-2024-0014,2,2024-11-19,2024-11-19,2024-11,2000,Trade Payables,Consultant invoice,0.00,2755.00,arivera,mgr_lee,System

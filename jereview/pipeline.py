@@ -54,3 +54,15 @@ def run_pipeline(raw_df: pd.DataFrame, *, mapping: dict | None = None,
 
     return Output(result=result, triage_md=triage_md, used_ai=used_ai,
                   xlsx_bytes=xlsx_bytes, csv_bytes=csv_bytes)
+
+
+def workpaper_bytes(result: RunResult, *, source_name: str = "upload",
+                    triage_md: str | None = None, dispositions: dict | None = None):
+    """Regenerate the Excel + CSV workpaper bytes from a RunResult, optionally
+    folding in auditor dispositions. Used by the UI to refresh downloads after
+    the reviewer edits dispositions, without re-running the engine."""
+    import io
+    xbuf, cbuf = io.BytesIO(), io.StringIO()
+    write_excel(result, xbuf, source_name=source_name, triage_md=triage_md, dispositions=dispositions)
+    write_csv(result, cbuf, dispositions=dispositions)
+    return xbuf.getvalue(), cbuf.getvalue().encode("utf-8")

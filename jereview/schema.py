@@ -45,6 +45,29 @@ CANONICAL_FIELDS = [
 REQUIRED_FIELDS = ["je_id", "entry_date", "account"]
 
 
+def _clean_numeric(s: pd.Series) -> pd.Series:
+    """Coerce a possibly-messy money column to float: handles $/£/€, thousands
+    separators, whitespace, and parenthesised negatives like '(1,234.56)'."""
+    if pd.api.types.is_numeric_dtype(s):
+        return pd.to_numeric(s, errors="coerce")
+    t = s.astype("string").str.strip()
+    neg = (t.str.startswith("(") & t.str.endswith(")")).fillna(False)
+    t = t.str.replace(r"^\((.*)\)$", r"\1", regex=True)
+    t = t.str.replace(",", "", regex=False)
+    t = t.str.replace(r"[^0-9.\-]", "", regex=True)
+    t = t.replace({"": pd.NA, "-": pd.NA, ".": pd.NA})
+    num = pd.to_numeric(t, errors="coerce")
+    return num.where(~neg, -num.abs())
+
+
+def _to_datetime(s: pd.Series) -> pd.Series:
+    """Parse dates tolerantly across mixed formats."""
+    try:
+        return pd.to_datetime(s, errors="coerce", format="mixed")
+    except (ValueError, TypeError):
+        return pd.to_datetime(s, errors="coerce")
+
+
 @dataclass
 class ColumnMapping:
     """Maps canonical field name -> source column name in the export."""
@@ -59,7 +82,8 @@ class ColumnMapping:
     @classmethod
     def identity(cls, columns: list[str]) -> "ColumnMapping":
         """Assume the export already uses canonical names (for our sample data)."""
-        return cls(mapping={c: c for c in CANONICAL_FIELDS if c in columns})
+        cols = [str(c).strip() for c in columns]
+        return cls(mapping={c: c for c in CANONICAL_FIELDS if c in cols})
 
 
 class NormalizationError(ValueError):
@@ -73,8 +97,10 @@ def normalize(df_raw: pd.DataFrame, mapping: ColumnMapping) -> pd.DataFrame:
     Missing OPTIONAL fields are added as empty columns so rules can detect
     their absence and skip gracefully. Missing REQUIRED fields raise.
     """
-    inv = {src: canon for canon, src in mapping.mapping.items()}
+    df_raw = df_raw.rename(columns=lambda c: str(c).strip())
+    inv = {str(src).strip(): canon for canon, src in mapping.mapping.items()}
     df = df_raw.rename(columns=inv).copy()
+    df = df.dropna(how="all")            # drop fully-blank rows some exports include
 
     missing_required = [f for f in REQUIRED_FIELDS if f not in df.columns]
     if missing_required:
@@ -91,17 +117,16 @@ def normalize(df_raw: pd.DataFrame, mapping: ColumnMapping) -> pd.DataFrame:
             "Provide either an `amount` column or both `debit` and `credit`."
         )
     if not has_amount:
-        df["amount"] = pd.to_numeric(df["debit"], errors="coerce").fillna(0) - \
-            pd.to_numeric(df["credit"], errors="coerce").fillna(0)
+        df["amount"] = _clean_numeric(df["debit"]).fillna(0) - _clean_numeric(df["credit"]).fillna(0)
     else:
-        df["amount"] = pd.to_numeric(df["amount"], errors="coerce")
+        df["amount"] = _clean_numeric(df["amount"])
     if not has_dc:
         amt = df["amount"]
         df["debit"] = amt.clip(lower=0)
         df["credit"] = (-amt).clip(lower=0)
     else:
-        df["debit"] = pd.to_numeric(df["debit"], errors="coerce").fillna(0)
-        df["credit"] = pd.to_numeric(df["credit"], errors="coerce").fillna(0)
+        df["debit"] = _clean_numeric(df["debit"]).fillna(0)
+        df["credit"] = _clean_numeric(df["credit"]).fillna(0)
 
     # add any absent optional fields as empty so rule guards work uniformly
     for f in CANONICAL_FIELDS:
@@ -110,9 +135,10 @@ def normalize(df_raw: pd.DataFrame, mapping: ColumnMapping) -> pd.DataFrame:
 
     # types
     for dcol in ["entry_date", "effective_date", "posted_at"]:
-        df[dcol] = pd.to_datetime(df[dcol], errors="coerce")
+        df[dcol] = _to_datetime(df[dcol])
     df["account"] = df["account"].astype("string").str.strip()
     df["je_id"] = df["je_id"].astype("string").str.strip()
+    df = df[df["je_id"].notna() & (df["je_id"].str.len() > 0)]
     for tcol in ["account_name", "description", "entered_by", "approved_by", "source"]:
         df[tcol] = df[tcol].astype("string")
 
@@ -122,7 +148,7 @@ def normalize(df_raw: pd.DataFrame, mapping: ColumnMapping) -> pd.DataFrame:
     df["period"] = df["period"].astype("string")
     df["period"] = df["period"].where(df["period"].notna() & (df["period"].str.len() > 0), derived_period)
 
-    return df[CANONICAL_FIELDS]
+    return df[CANONICAL_FIELDS].reset_index(drop=True)
 
 
 def available_fields(df: pd.DataFrame) -> set[str]:
